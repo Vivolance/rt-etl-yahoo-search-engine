@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "rt-etl-yahoo-search-engine"
+version = "0.1.0"
+description = "RT ETL Pipeline for Yahoo Search Engine"
+authors = ["Elson Chan <elsonccjgmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+confluent-kafka = "^2.5.3"
+aiohttp = "^3.10.5"
+psycopg2-binary = "^2.9.9"
+sqlalchemy = "^2.0.35"
+alembic = "^1.13.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+black = "^24.8.0"
+ruff = "^0.6.5"
+mypy = "^1.11.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
