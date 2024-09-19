@@ -54,3 +54,23 @@ We propose an architecture which ingests these yahoo search results async
 - Extracts the structured data from the result
 - Saves the structured data into postgres table
 - Updates the job status to completed for the job_id
+
+## TODO:
+- [x] Create Async front desk server, responsible for giving a job id to the client
+- [x] Create alembic sqlalchemy tables
+- [ ] Added `/search` endpoint 
+  - [x] to save a new record to `jobs` table
+  - [ ] Make main thread put a record to be produced, to `queue.Queue`
+  - [ ] Create background thread to listen to messages from a `queue.Queue`, to be produced to topic `raw_search_terms`
+  - [ ] Setup Kafka Cluster, create new topic `raw_search_terms`
+- [ ] Add first consumer / producer process. `yahoo_search_consumer_producer.py`
+  - [ ] Consumes from `raw_search_terms`
+  - [ ] Makes API call to yahoo search engine API
+  - [ ] Save results to `raw_search_results` table
+  - [ ] Produce message to `raw_search_results` topic
+- [ ] Add second consumer process. `extractor_consumer.py`
+  - [ ] Consumes from `raw_search_results` topic
+  - [ ] Use `raw_search_results_id` to query for full search results from `raw_search_results` PG table
+  - [ ] Extract
+  - [ ] Save results to `extracted_search_results` PG table
+  - [ ] Update SET `jobs` record's `job_status` to `JobStatus.COMPLETED`
