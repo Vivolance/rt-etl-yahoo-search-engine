@@ -12,6 +12,9 @@ aiohttp = "^3.10.5"
 psycopg2-binary = "^2.9.9"
 sqlalchemy = "^2.0.35"
 alembic = "^1.13.2"
+pydantic = "^2.9.2"
+asyncpg = "^0.29.0"
+greenlet = "^3.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
