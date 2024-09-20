@@ -13,7 +13,7 @@ We propose an architecture which ingests these yahoo search results async
 1. Provide an async API, allowing users to pass in a search term. They will be given a job id, to check the status of the extraction, and retrieve the results.
 
 2. The async API should support high-throughput and real-time extraction in order of seconds.
-- User should be able to receive back the results in seconds
+- Users should be able to receive back the results in seconds
 - The async server should be able to handle ~1,000+ concurrent connections
 
 ## High-Level Architecture
