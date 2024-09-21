@@ -29,7 +29,7 @@ class ProducerThread(Thread):
         self._shutdown_event: Event = Event()
         self._producer: Producer = Producer(producer_config)
         self._topic_name: str = "raw_search_terms"
-        self._batch: list[str] = []
+        self._batch: list[dict[str, str]] = []
         self._batch_size: int = 100
         # start of batch
         self._batch_start: float = (
@@ -70,8 +70,7 @@ class ProducerThread(Thread):
         while not self._shutdown_event.is_set():
             record: RawSearchTermsRecord = self._queue.get()
             record_dict: dict[str, str] = record.model_dump()
-            record_str: str = json.dumps(record_dict)
-            self._batch.append(record_str)
+            self._batch.append(record_dict)
             batch_is_ready: bool = self.batch_ready()
             if batch_is_ready:
                 serialized_batch: str = json.dumps(self._batch)
