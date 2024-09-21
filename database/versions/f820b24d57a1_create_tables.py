@@ -1,8 +1,8 @@
 """Create tables
 
-Revision ID: 34ce44675e1e
+Revision ID: f820b24d57a1
 Revises: 
-Create Date: 2024-09-19 23:23:55.697366
+Create Date: 2024-09-21 16:02:56.899774
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "34ce44675e1e"
+revision: str = "f820b24d57a1"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -65,6 +65,7 @@ def upgrade() -> None:
             sa.Enum("IN_PROGRESS", "CANCELLED", "FAILED", name="jobstatus"),
             nullable=False,
         ),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
             ["extracted_search_results_id"],
             ["extracted_search_results.id"],
@@ -88,4 +89,5 @@ def downgrade() -> None:
     op.drop_table("raw_search_results")
     op.drop_table("extracted_search_results")
     op.drop_table("users")
+    op.execute("DROP TYPE JobStatus")
     # ### end Alembic commands ###

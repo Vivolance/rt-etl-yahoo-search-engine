@@ -82,6 +82,7 @@ CREATE TABLE jobs(
     raw_search_results_id TEXT,
     extracted_search_results_id TEXT,
     job_status EnumType NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (extracted_search_results_id) REFERENCES extracted_search_results(id),
     FOREIGN KEY (search_id) REFERENCES search_results(id)
@@ -105,4 +106,5 @@ jobs_table: Table = Table(
         nullable=True,
     ),
     Column("job_status", SQLAlchemyEnum(JobStatus), nullable=False),
+    Column("created_at", DateTime, nullable=False),
 )

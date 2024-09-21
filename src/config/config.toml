@@ -1,0 +1,7 @@
+[kafka.producer]
+    bootstrap_servers = "localhost:9092"
+    client_id = "rt-yse-server-producer"
+    acks = "all"
+
+[postgres]
+    connection_string = "postgresql+asyncpg://localhost:5432/yahoo_search_engine_rt"

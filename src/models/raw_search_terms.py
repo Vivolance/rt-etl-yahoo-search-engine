@@ -9,10 +9,10 @@ class RawSearchTermsRecord(BaseModel):
     """
 
     user_id: str
-    search_terms: str
+    search_term: str
     job_id: str
     job_created_at: datetime
 
     @field_serializer("job_created_at")
     def serialize_job_created_at(self, value: datetime) -> str:
-        return value.strftime("%Y-%m-%d %H:%M:%S")
+        return value.strftime("%Y-%m-%dT%H:%M:%S")

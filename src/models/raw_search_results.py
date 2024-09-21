@@ -13,8 +13,8 @@ class RawSearchResultsRecord(BaseModel):
 
     @field_serializer("job_created_at")
     def serialize_job_created_at(self, value: datetime) -> str:
-        return value.strftime("%Y-%m-%d %H:%M:%S")
+        return value.strftime("%Y-%m-%dT%H:%M:%S")
 
     @field_serializer("raw_search_at")
     def serialize_raw_search_at(self, value: datetime) -> str:
-        return value.strftime("%Y-%m-%d %H:%M:%S")
+        return value.strftime("%Y-%m-%dT%H:%M:%S")

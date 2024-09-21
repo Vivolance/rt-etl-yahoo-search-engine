@@ -108,6 +108,28 @@ Topic 2: `raw_search_results`
 }
 ```
 
+## Producing a message
+
+Spin up server
+
+```commandline
+export PYTHONPATH=.
+python3 src/app.py
+```
+
+POST command to `localhost:8000` with payload
+
+```json
+```
+
+Check topic: `raw_seach_terms`
+
+```commandline
+/Users/elsonchan/Desktop/kafka_2.13-3.7.1/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic raw_search_terms --from-beginning
+
+["{\"user_id\": \"1\", \"search_term\": \"Coffee Bean\", \"job_id\": \"f2dac9d8-d840-404d-b868-568a2615aa03\", \"job_created_at\": \"2024-09-21T08:28:49\"}"]
+```
+
 ## TODO:
 - [x] Create Async front desk server, responsible for giving a job id to the client
 - [x] Create alembic sqlalchemy tables
