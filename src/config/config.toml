@@ -1,7 +1,20 @@
-[kafka.producer]
+[kafka.producer.server]
     bootstrap_servers = "localhost:9092"
-    client_id = "rt-yse-server-producer"
+    client_id = "rt-yse-server-producer-1"
     acks = "all"
+
+[kafka.consumer.yahoo_search]
+    bootstrap_servers = "localhost:9092"
+    enable_auto_commit = false
+    client_id = "rt-yse-search-consumer-1"
+    group_id = "rt-yse-search-consumer-1"
+    auto_offset_reset = "earliest"
+
+[kafka.producer.yahoo_search]
+
+[kafka.consumer.extractor]
+
+[kafka.producer.extractor]
 
 [postgres]
     connection_string = "postgresql+asyncpg://localhost:5432/yahoo_search_engine_rt"

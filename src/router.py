@@ -9,6 +9,7 @@ import json
 
 from src.models.raw_search_terms import RawSearchTermsRecord
 from src.models.status_dto import JobsDTO
+from src.services.batcher_service import Batcher
 from src.services.status_dao import JobsDAO
 from queue import Queue
 from confluent_kafka import Producer
@@ -28,56 +29,25 @@ class ProducerThread(Thread):
         self._queue: Queue = queue
         self._shutdown_event: Event = Event()
         self._producer: Producer = Producer(producer_config)
+        self._batcher: Batcher[dict[str, str]] = Batcher()
         self._topic_name: str = "raw_search_terms"
-        self._batch: list[dict[str, str]] = []
-        self._batch_size: int = 100
-        # start of batch
-        self._batch_start: float = (
-            -1
-        )  # this will be set at the start of the thread again
-        self._batch_timeout_s: int = 1
-
-    def reset_batch(self) -> None:
-        """
-        Resets the batch
-        - Clear the batch list
-        - Reset the batch start
-        """
-        self._batch.clear()
-        self._batch_start = time.perf_counter()
 
     def flush_producer(self) -> None:
         self._producer.flush()
-
-    def batch_ready(self) -> bool:
-        """
-        Case 1: current time - batch_start > _batch_timeout_s
-        - produce
-
-        Case 2: batch_size == 100
-        - produce
-
-        return False
-        """
-        hit_timeout: bool = (
-            time.perf_counter() - self._batch_start > self._batch_timeout_s
-        )
-        hit_batch_size: bool = len(self._batch) == self._batch_size
-        return hit_timeout or hit_batch_size
 
     def _run_impl(self) -> None:
         self._batch_start = time.perf_counter()
         while not self._shutdown_event.is_set():
             record: RawSearchTermsRecord = self._queue.get()
             record_dict: dict[str, str] = record.model_dump()
-            self._batch.append(record_dict)
-            batch_is_ready: bool = self.batch_ready()
-            if batch_is_ready:
-                serialized_batch: str = json.dumps(self._batch)
+            self._batcher.append(record_dict)
+            if self._batcher.batch_ready():
+                batch: list[dict[str, str]] = self._batcher.get_batch()
+                serialized_batch: str = json.dumps(batch)
                 self._producer.produce(topic=self._topic_name, value=serialized_batch)
                 # wait for the batch of messages to be produced successfully
                 self.flush_producer()
-                self.reset_batch()
+                self._batcher.reset_batch()
         # at this point, the shutdown has occurred
         self.flush_producer()
 

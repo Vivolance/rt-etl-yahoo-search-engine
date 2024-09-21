@@ -14,10 +14,11 @@ if __name__ == "__main__":
 
     config: dict[str, Any] = toml.load("src/config/config.toml")
     pg_config: dict[str, Any] = config["postgres"]
-    producer_config: dict[str, str] = config["kafka"]["producer"]
+    producer_config: dict[str, str] = config["kafka"]["producer"]["server"]
     formatted_producer_config: dict[str, Any] = {
         key.replace("_", "."): value for key, value in producer_config.items()
     }
+    print(formatted_producer_config)
     connection_string: str = pg_config["connection_string"]
     status_dao: JobsDAO = JobsDAO(connection_string)
     router: Router = Router(status_dao, formatted_producer_config)
