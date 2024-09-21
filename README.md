@@ -55,6 +55,59 @@ We propose an architecture which ingests these yahoo search results async
 - Saves the structured data into postgres table
 - Updates the job status to completed for the job_id
 
+## Project Setup
+
+### 1. Setup env
+
+```commandline
+poetry shell
+poetry install
+```
+
+### 2. Run Zookeeper Server
+
+Navigate to kafka folder
+
+```commandline
+bin/zookeeper-server-start.sh ./config/zookeeper.properties
+```
+
+### 3. Run Kafka Server
+
+```commandline
+bin/kafka-server-start.sh ./config/server.properties
+```
+
+### 4. Create two topics:
+
+```
+./create_topics.sh
+```
+
+Topic 1: `raw_search_terms`
+
+```json
+{
+  "user_id": "123",
+  "search_term": "Starbucks Coffee",
+  "job_id": "123",
+  "job_created_at": "2024-09-21 00:00:00"
+}
+```
+
+Topic 2: `raw_search_results`
+
+```json
+{
+  "user_id": "123",
+  "search_term": "Starbucks Coffee",
+  "job_id": "123",
+  "job_created_at": "2024-09-21 00:00:00", 
+  "raw_search_results_id": "1234",
+  "raw_search_at": "2024-09-21 00:00:01"
+}
+```
+
 ## TODO:
 - [x] Create Async front desk server, responsible for giving a job id to the client
 - [x] Create alembic sqlalchemy tables
