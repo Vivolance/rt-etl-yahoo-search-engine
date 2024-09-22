@@ -7,20 +7,17 @@ from aiohttp.web import Request, Response
 from typing import Any
 import json
 
+
+from src.consumers.producers import RawSearchTermsProducer
 from src.models.raw_search_terms import RawSearchTermsRecord
 from src.models.status_dto import JobsDTO
 from src.services.batcher_service import Batcher
 from src.services.status_dao import JobsDAO
 from queue import Queue
-from confluent_kafka import Producer
 
 
 class ProducerThread(Thread):
-    def __init__(
-        self,
-        queue: Queue,
-        producer_config: dict[str, str],
-    ) -> None:
+    def __init__(self, queue: Queue, producer: RawSearchTermsProducer) -> None:
         """
         Listens to a queue of records to `raw_search_terms`
         For each record in the queue, produce it to the topic
@@ -28,28 +25,22 @@ class ProducerThread(Thread):
         super().__init__()
         self._queue: Queue = queue
         self._shutdown_event: Event = Event()
-        self._producer: Producer = Producer(producer_config)
-        self._batcher: Batcher[dict[str, str]] = Batcher()
-        self._topic_name: str = "raw_search_terms"
-
-    def flush_producer(self) -> None:
-        self._producer.flush()
+        self._batcher: Batcher[RawSearchTermsRecord] = Batcher()
+        self._producer: RawSearchTermsProducer = producer
 
     def _run_impl(self) -> None:
         self._batch_start = time.perf_counter()
         while not self._shutdown_event.is_set():
             record: RawSearchTermsRecord = self._queue.get()
-            record_dict: dict[str, str] = record.model_dump()
-            self._batcher.append(record_dict)
+            self._batcher.append(record)
             if self._batcher.batch_ready():
-                batch: list[dict[str, str]] = self._batcher.get_batch()
-                serialized_batch: str = json.dumps(batch)
-                self._producer.produce(topic=self._topic_name, value=serialized_batch)
+                batch: list[RawSearchTermsRecord] = self._batcher.get_batch()
                 # wait for the batch of messages to be produced successfully
-                self.flush_producer()
+                self._producer.produce(batch)
+                self._producer.flush_producer()
                 self._batcher.reset_batch()
         # at this point, the shutdown has occurred
-        self.flush_producer()
+        self._producer.flush_producer()
 
     def run(self) -> None:
         try:
@@ -58,7 +49,7 @@ class ProducerThread(Thread):
             print(f"Encountered Exception: {e}")
         finally:
             # always flush, even if something goes wrong
-            self.flush_producer()
+            self._producer.flush_producer()
 
     def stop(self) -> None:
         self._shutdown_event.set()
@@ -68,8 +59,11 @@ class Router:
     def __init__(self, status_dao: JobsDAO, producer_config: dict[str, str]) -> None:
         self._status_dao: JobsDAO = status_dao
         self._queue: Queue = Queue()
+        self._producer: RawSearchTermsProducer = RawSearchTermsProducer(
+            producer_config=producer_config
+        )
         self._producer_thread = ProducerThread(
-            queue=self._queue, producer_config=producer_config
+            queue=self._queue, producer=self._producer
         )
         # start the producer thread
         self._producer_thread.start()

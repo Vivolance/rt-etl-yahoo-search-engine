@@ -11,6 +11,9 @@
     auto_offset_reset = "earliest"
 
 [kafka.producer.yahoo_search]
+    bootstrap_servers = "localhost:9092"
+    client_id = "rt-yse-search-producer-1"
+    acks = "all"
 
 [kafka.consumer.extractor]
 

@@ -3,6 +3,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, field_serializer, field_validator, SkipValidation
 
+from src.models.raw_search_terms import RawSearchTermsRecord
+
 
 class RawSearchResults(BaseModel):
     id: str
@@ -51,3 +53,16 @@ class RawSearchResultsRecord(BaseModel):
         if isinstance(value, str):
             return datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
         return value
+
+    @staticmethod
+    def create_from_raw_search_term_and_results(
+        input_record: RawSearchTermsRecord, output_record: RawSearchResults
+    ) -> "RawSearchResultsRecord":
+        return RawSearchResultsRecord(
+            user_id=input_record.user_id,
+            search_term=input_record.search_term,
+            job_id=input_record.job_id,
+            job_created_at=input_record.job_created_at,
+            raw_search_results_id=output_record.id,
+            raw_search_at=output_record.created_at,
+        )
