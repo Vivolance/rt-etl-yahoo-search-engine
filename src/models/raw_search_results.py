@@ -1,6 +1,27 @@
+import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, field_serializer, field_validator
+from pydantic import BaseModel, field_serializer, field_validator, SkipValidation
+
+
+class RawSearchResults(BaseModel):
+    id: str
+    user_id: str
+    search_term: str
+    result: str | None
+    created_at: SkipValidation[datetime]
+
+    @staticmethod
+    def create(
+        user_id: str, search_term: str, result: str | None
+    ) -> "RawSearchResults":
+        return RawSearchResults(
+            id=str(uuid.uuid4()),
+            user_id=user_id,
+            search_term=search_term,
+            result=result,
+            created_at=datetime.utcnow(),
+        )
 
 
 class RawSearchResultsRecord(BaseModel):
