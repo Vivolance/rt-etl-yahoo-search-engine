@@ -7,7 +7,7 @@ from aiohttp import web
 from aiohttp.web_routedef import post
 import toml
 from src.router import Router
-from src.services.status_dao import JobsDAO
+from src.services.daos.status_dao import JobsDAO
 
 if __name__ == "__main__":
     app: Application = Application()

@@ -9,10 +9,10 @@ import json
 
 
 from src.consumers.producers import RawSearchTermsProducer
-from src.models.raw_search_terms import RawSearchTermsRecord
-from src.models.status_dto import JobsDTO
+from src.models.kafka_records.raw_search_terms import RawSearchTermsRecord
+from src.models.dtos.status_dto import JobsDTO
 from src.services.batcher_service import Batcher
-from src.services.status_dao import JobsDAO
+from src.services.daos.status_dao import JobsDAO
 from queue import Queue
 
 
@@ -84,16 +84,16 @@ class Router:
             return Response(status=400, text="User id is empty")
 
         # Step 1: Save job id into Postgres
-        status_dto: JobsDTO = JobsDTO.new(user_id=user_id)
+        status_dto: JobsDTO = JobsDTO.create_job(user_id=user_id)
         await self._status_dao.insert_status(status_dto)
         response_body: dict[str, Any] = {
-            "job_id": status_dto.id,
+            "job_id": status_dto.jobs_id,
             "search_term": search_term,
         }
         raw_search_terms_record: RawSearchTermsRecord = RawSearchTermsRecord(
             user_id=user_id,
             search_term=search_term,
-            job_id=status_dto.id,
+            job_id=status_dto.jobs_id,
             job_created_at=status_dto.created_at,
         )
         # Step 2: Produce to background thread

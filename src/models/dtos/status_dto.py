@@ -7,21 +7,43 @@ from database.tables import JobStatus
 
 
 class JobsDTO(BaseModel):
+    """
+    id is unique
+
+    we can have multiple rows with the same jobs_id
+    - PIT style; an update is an insert
+    """
+
     id: str
+    jobs_id: str
     user_id: str
     raw_search_results_id: str | None
-    extracted_search_results_id: str | None
     job_status: JobStatus
     created_at: datetime
 
     @staticmethod
-    def new(user_id: str) -> "JobsDTO":
+    def create_job(user_id: str) -> "JobsDTO":
         return JobsDTO(
             id=str(uuid.uuid4()),
+            jobs_id=str(uuid.uuid4()),
             user_id=user_id,
             raw_search_results_id=None,
-            extracted_search_results_id=None,
             job_status=JobStatus.IN_PROGRESS,
+            created_at=datetime.utcnow(),
+        )
+
+    @staticmethod
+    def create_completed_job(
+        jobs_id: str,
+        user_id: str,
+        raw_search_results_id: str,
+    ) -> "JobsDTO":
+        return JobsDTO(
+            id=str(uuid.uuid4()),
+            jobs_id=jobs_id,
+            user_id=user_id,
+            raw_search_results_id=raw_search_results_id,
+            job_status=JobStatus.COMPLETED,
             created_at=datetime.utcnow(),
         )
 

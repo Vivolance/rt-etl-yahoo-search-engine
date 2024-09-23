@@ -1,8 +1,8 @@
-"""Create tables
+"""Add tables
 
-Revision ID: f820b24d57a1
+Revision ID: 55303ac03b06
 Revises: 
-Create Date: 2024-09-21 16:02:56.899774
+Create Date: 2024-09-23 23:54:26.405678
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "f820b24d57a1"
+revision: str = "55303ac03b06"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -30,6 +30,7 @@ def upgrade() -> None:
     op.create_table(
         "extracted_search_results",
         sa.Column("id", sa.Text(), nullable=False),
+        sa.Column("jobs_id", sa.Text(), nullable=False),
         sa.Column("user_id", sa.Text(), nullable=False),
         sa.Column("url", sa.Text(), nullable=True),
         sa.Column("date", sa.Text(), nullable=True),
@@ -57,19 +58,17 @@ def upgrade() -> None:
     op.create_table(
         "jobs",
         sa.Column("id", sa.Text(), nullable=False),
+        sa.Column("jobs_id", sa.Text(), nullable=False),
         sa.Column("user_id", sa.Text(), nullable=False),
         sa.Column("raw_search_results_id", sa.Text(), nullable=True),
-        sa.Column("extracted_search_results_id", sa.Text(), nullable=True),
         sa.Column(
             "job_status",
-            sa.Enum("IN_PROGRESS", "CANCELLED", "FAILED", name="jobstatus"),
+            sa.Enum(
+                "IN_PROGRESS", "COMPLETED", "CANCELLED", "FAILED", name="jobstatus"
+            ),
             nullable=False,
         ),
         sa.Column("created_at", sa.DateTime(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["extracted_search_results_id"],
-            ["extracted_search_results.id"],
-        ),
         sa.ForeignKeyConstraint(
             ["raw_search_results_id"],
             ["raw_search_results.id"],
@@ -89,5 +88,4 @@ def downgrade() -> None:
     op.drop_table("raw_search_results")
     op.drop_table("extracted_search_results")
     op.drop_table("users")
-    op.execute("DROP TYPE JobStatus")
     # ### end Alembic commands ###

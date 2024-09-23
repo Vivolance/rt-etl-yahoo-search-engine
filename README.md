@@ -154,8 +154,7 @@ python src/yahoo_search_process.py
 ## Check topic: `raw_search_results`
 
 ```commandline
-/Users/elsonchan/Desktop/kafka_2.13-3.7.1/bin/kafka-console-consumer.sh --bootstrap-server loc
-alhost:9092 --topic raw_search_results --from-beginning
+/Users/elsonchan/Desktop/kafka_2.13-3.7.1/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic raw_search_results --from-beginning
 
 [{"user_id": "1", "search_term": "Gout", "job_id": "f59200ad-50dc-46c8-8287-2c85ac25e9b1", "job_created_at": "2024-09-22T09:43:41", "raw_search_results_id": "28e9741b-d51b-4076-8153-46e48febccf5", "raw_search_at": "2024-09-22T10:14:39"}, {"user_id": "1", "search_term": "Gout", "job_id": "1831cdc1-d555-4292-bf52-f6143ce0a9dd", "job_created_at": "2024-09-22T09:43:42", "raw_search_results_id": "7ebb9571-8e17-46f3-9082-ec32c96051d0", "raw_search_at": "2024-09-22T10:14:39"}, {"user_id": "1", "search_term": "Mala", "job_id": "da93d5f9-3ef8-4808-9d1e-b177a69e1bb5", "job_created_at": "2024-09-22T10:14:39", "raw_search_results_id": "1e7fc34d-9bc3-46a1-ab4d-c361b5cb259e", "raw_search_at": "2024-09-22T10:14:39"}]
 [{"user_id": "1", "search_term": "Chicken Rice", "job_id": "7cd25644-9468-4b99-a60b-9ea25513eb1d", "job_created_at": "2024-09-22T10:14:56", "raw_search_results_id": "fadc5f38-fd6b-469a-8ced-91225cf97267", "raw_search_at": "2024-09-22T10:14:57"}]

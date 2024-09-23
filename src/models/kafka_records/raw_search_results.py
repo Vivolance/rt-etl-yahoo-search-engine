@@ -1,29 +1,9 @@
-import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, field_serializer, field_validator, SkipValidation
+from pydantic import BaseModel, field_serializer, field_validator
 
-from src.models.raw_search_terms import RawSearchTermsRecord
-
-
-class RawSearchResults(BaseModel):
-    id: str
-    user_id: str
-    search_term: str
-    result: str | None
-    created_at: SkipValidation[datetime]
-
-    @staticmethod
-    def create(
-        user_id: str, search_term: str, result: str | None
-    ) -> "RawSearchResults":
-        return RawSearchResults(
-            id=str(uuid.uuid4()),
-            user_id=user_id,
-            search_term=search_term,
-            result=result,
-            created_at=datetime.utcnow(),
-        )
+from src.models.dtos.raw_search_results_dto import RawSearchResultsDTO
+from src.models.kafka_records.raw_search_terms import RawSearchTermsRecord
 
 
 class RawSearchResultsRecord(BaseModel):
@@ -56,7 +36,7 @@ class RawSearchResultsRecord(BaseModel):
 
     @staticmethod
     def create_from_raw_search_term_and_results(
-        input_record: RawSearchTermsRecord, output_record: RawSearchResults
+        input_record: RawSearchTermsRecord, output_record: RawSearchResultsDTO
     ) -> "RawSearchResultsRecord":
         return RawSearchResultsRecord(
             user_id=input_record.user_id,

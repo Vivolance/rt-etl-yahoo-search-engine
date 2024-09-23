@@ -7,10 +7,11 @@ import toml
 
 from src.consumers.consumers import RawSearchTermConsumer
 from src.consumers.producers import RawSearchResultsProducer
-from src.models.raw_search_results import RawSearchResults, RawSearchResultsRecord
-from src.models.raw_search_terms import RawSearchTermsRecord
+from src.models.dtos.raw_search_results_dto import RawSearchResultsDTO
+from src.models.kafka_records.raw_search_results import RawSearchResultsRecord
+from src.models.kafka_records.raw_search_terms import RawSearchTermsRecord
 from src.services.batcher_service import Batcher
-from src.services.raw_search_results_dao import RawSearchResultsDAO
+from src.services.daos.raw_search_results_dao import RawSearchResultsDAO
 from src.services.yahoo_search_service import YahooSearchService
 
 
@@ -37,7 +38,7 @@ class YahooSearchProcess:
 
     async def get_yahoo_search(
         self, record: RawSearchTermsRecord
-    ) -> tuple[RawSearchTermsRecord, RawSearchResults]:
+    ) -> tuple[RawSearchTermsRecord, RawSearchResultsDTO]:
         raw_search_result = await self._yahoo_search_service.yahoo_search(
             user_id=record.user_id, search_term=record.search_term
         )
@@ -54,16 +55,16 @@ class YahooSearchProcess:
                 print(f"batch_of_records: {batch_of_records}")
                 if batch_of_records:
                     yahoo_search_futures: list[
-                        Future[tuple[RawSearchTermsRecord, RawSearchResults]]
+                        Future[tuple[RawSearchTermsRecord, RawSearchResultsDTO]]
                     ] = [
                         asyncio.ensure_future(self.get_yahoo_search(record))
                         for record in batch_of_records
                     ]
                     all_yahoo_search_future: Future[
-                        list[tuple[RawSearchTermsRecord, RawSearchResults]]
+                        list[tuple[RawSearchTermsRecord, RawSearchResultsDTO]]
                     ] = asyncio.gather(*yahoo_search_futures)
                     all_search_results: list[
-                        tuple[RawSearchTermsRecord, RawSearchResults]
+                        tuple[RawSearchTermsRecord, RawSearchResultsDTO]
                     ] = await all_yahoo_search_future
                     await self._dao.insert_many(
                         [output for _, output in all_search_results]

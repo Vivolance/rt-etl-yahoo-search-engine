@@ -1,7 +1,8 @@
 from urllib.parse import quote
 import aiohttp
 from retry import retry
-from src.models.raw_search_results import RawSearchResults
+
+from src.models.dtos.raw_search_results_dto import RawSearchResultsDTO
 
 
 class YahooSearchService:
@@ -25,7 +26,7 @@ class YahooSearchService:
         jitter=(-0.01, 0.01),
         backoff=2,
     )
-    async def _search(self, user_id: str, search_term: str) -> RawSearchResults:
+    async def _search(self, user_id: str, search_term: str) -> RawSearchResultsDTO:
         """
         TODO: Integration test this
 
@@ -72,7 +73,7 @@ class YahooSearchService:
                     if response.status == 200:
                         # result is the html
                         result: str = await response.text()
-                        search_result = RawSearchResults.create(
+                        search_result = RawSearchResultsDTO.create(
                             user_id=user_id, search_term=search_term, result=result
                         )
                         return search_result
@@ -81,7 +82,7 @@ class YahooSearchService:
                             f"Response has a non-200 status code: "
                             f"{response.status} for url: {url}"
                         )
-                        return RawSearchResults.create(
+                        return RawSearchResultsDTO.create(
                             user_id=user_id, search_term=search_term, result=None
                         )
         except aiohttp.ClientError as e:
@@ -91,7 +92,7 @@ class YahooSearchService:
             print(e)
             raise e
 
-    async def yahoo_search(self, user_id: str, search_term: str) -> RawSearchResults:
+    async def yahoo_search(self, user_id: str, search_term: str) -> RawSearchResultsDTO:
         """
         Does two things:
         - Performs the search
@@ -104,10 +105,10 @@ class YahooSearchService:
         - insert_search is always called
         """
         try:
-            result: RawSearchResults = await self._search(user_id, search_term)
+            result: RawSearchResultsDTO = await self._search(user_id, search_term)
         except Exception as e:
             print(f"Ran in error {e}")
-            result = RawSearchResults.create(
+            result = RawSearchResultsDTO.create(
                 user_id=user_id, search_term=search_term, result=None
             )
         return result

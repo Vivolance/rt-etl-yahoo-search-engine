@@ -16,6 +16,7 @@ metadata: MetaData = MetaData()
 
 class JobStatus(Enum):
     IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
     FAILED = "FAILED"
 
@@ -56,6 +57,7 @@ raw_search_result_table: Table = Table(
 """
 CREATE TABLE extracted_search_results(
     id TEXT PRIMARY KEY,
+    jobs_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
     url TEXT,
     date TEXT,
@@ -68,6 +70,7 @@ extracted_search_results_table: Table = Table(
     "extracted_search_results",
     metadata,
     Column("id", Text, primary_key=True),
+    Column("jobs_id", Text, nullable=False),
     Column("user_id", Text, ForeignKey("users.id"), nullable=False),
     Column("url", Text, nullable=True),
     Column("date", Text, nullable=True),
@@ -80,7 +83,6 @@ CREATE TABLE jobs(
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL,
     raw_search_results_id TEXT,
-    extracted_search_results_id TEXT,
     job_status EnumType NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
@@ -92,17 +94,12 @@ jobs_table: Table = Table(
     "jobs",
     metadata,
     Column("id", Text, primary_key=True),
+    Column("jobs_id", Text, nullable=False),
     Column("user_id", Text, ForeignKey("users.id"), nullable=False),
     Column(
         "raw_search_results_id",
         Text,
         ForeignKey("raw_search_results.id"),
-        nullable=True,
-    ),
-    Column(
-        "extracted_search_results_id",
-        Text,
-        ForeignKey("extracted_search_results.id"),
         nullable=True,
     ),
     Column("job_status", SQLAlchemyEnum(JobStatus), nullable=False),

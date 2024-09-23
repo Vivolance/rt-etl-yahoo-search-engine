@@ -5,8 +5,8 @@ from pydantic import BaseModel
 
 from confluent_kafka import Producer
 
-from src.models.raw_search_results import RawSearchResultsRecord
-from src.models.raw_search_terms import RawSearchTermsRecord
+from src.models.kafka_records.raw_search_results import RawSearchResultsRecord
+from src.models.kafka_records.raw_search_terms import RawSearchTermsRecord
 
 ProduceMessage = TypeVar("ProduceMessage", bound=BaseModel)
 
