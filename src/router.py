@@ -7,11 +7,23 @@ from aiohttp.web import Request, Response
 from typing import Any
 import json
 
+from aiohttp.web_exceptions import HTTPBadRequest
+from pydantic import ValidationError
 
+from database.tables import JobStatus
 from src.consumers.producers import RawSearchTermsProducer
-from src.models.kafka_records.raw_search_terms import RawSearchTermsRecord
-from src.models.dtos.status_dto import JobsDTO
+from src.models.dto_data_classes.extracted_search_result_dto import (
+    ExtractedSearchResultDTO,
+)
+from src.models.kafka_records_data_classes.raw_search_terms import RawSearchTermsRecord
+from src.models.dto_data_classes.status_dto import JobsDTO
+from src.models.service_level_data_classes.input.result_input import ResultInput
+from src.models.service_level_data_classes.input.search_input import SearchInput
+from src.models.service_level_data_classes.input.status_input import StatusInput
+from src.models.service_level_data_classes.output.search_response import SearchResponse
+from src.models.service_level_data_classes.output.search_status import ResponseStatus
 from src.services.batcher_service import Batcher
+from src.services.daos.extracted_search_results_dao import ExtractedSearchResultsDAO
 from src.services.daos.status_dao import JobsDAO
 from queue import Queue
 
@@ -56,8 +68,16 @@ class ProducerThread(Thread):
 
 
 class Router:
-    def __init__(self, status_dao: JobsDAO, producer_config: dict[str, str]) -> None:
-        self._status_dao: JobsDAO = status_dao
+    def __init__(
+        self,
+        status_dao: JobsDAO,
+        extracted_search_results_dao: ExtractedSearchResultsDAO,
+        producer_config: dict[str, str],
+    ) -> None:
+        self._jobs_dao: JobsDAO = status_dao
+        self._extracted_search_results_dao: ExtractedSearchResultsDAO = (
+            extracted_search_results_dao
+        )
         self._queue: Queue = Queue()
         self._producer: RawSearchTermsProducer = RawSearchTermsProducer(
             producer_config=producer_config
@@ -71,25 +91,25 @@ class Router:
     async def search(self, request: Request) -> Response:
         try:
             body: dict[str, Any] = await request.json()
+            search_input: SearchInput = SearchInput.model_validate(body)
+        except json.JSONDecodeError:
+            raise HTTPBadRequest(reason="Invalid JSON payload")
+        except ValidationError as err:
+            return Response(status=400, text=f"Failed to parse input with error: {err}")
         except Exception as err:
             print(f"Unable to parse body with err: {err}")
             return Response(status=500, text=f"Unable to parse body with err: {err}")
 
         # validation of client payload
-        search_term: str | None = body.get("search_term")
-        if search_term is None:
-            return Response(status=400, text="Search term is empty")
-        user_id: str | None = body.get("user_id")
-        if user_id is None:
-            return Response(status=400, text="User id is empty")
+        search_term: str = search_input.search_term
+        user_id: str = search_input.user_id
 
         # Step 1: Save job id into Postgres
         status_dto: JobsDTO = JobsDTO.create_job(user_id=user_id)
-        await self._status_dao.insert_status(status_dto)
-        response_body: dict[str, Any] = {
-            "job_id": status_dto.jobs_id,
-            "search_term": search_term,
-        }
+        await self._jobs_dao.insert_status(status_dto)
+        response_body: SearchResponse = SearchResponse(
+            job_id=status_dto.jobs_id, search_term=search_term
+        )
         raw_search_terms_record: RawSearchTermsRecord = RawSearchTermsRecord(
             user_id=user_id,
             search_term=search_term,
@@ -99,17 +119,68 @@ class Router:
         # Step 2: Produce to background thread
         self._queue.put(raw_search_terms_record)
 
-        serialized_body = json.dumps(response_body)
+        serialized_body_dict: dict[str, Any] = response_body.model_dump()
+        serialized_body: str = json.dumps(serialized_body_dict)
         return Response(text=serialized_body)
 
     async def status(self, request: Request) -> Response:
-        body: dict[str, Any] = {"status": "In Progress"}
-        serialized_body = json.dumps(body)
-        return Response(text=serialized_body)
+        """
+        {
+            "job_id": "1",
+            "status": "IN_PROGRESS"
+        }
+        IN_PROGRESS, COMPLETED, CANCELLED, FAILED
+        """
+        try:
+            request_params: dict[str, Any] = await request.json()
+            status_input: StatusInput = StatusInput.model_validate(request_params)
+        except json.JSONDecodeError:
+            raise HTTPBadRequest(reason="Invalid JSON payload")
+        except ValidationError as err:
+            return Response(status=400, text=f"Failed to parse input with error: {err}")
+        except Exception as err:
+            print(f"Unable to parse body with err: {err}")
+            return Response(status=500, text=f"Unable to parse body with err: {err}")
+
+        jobs_dto: JobsDTO | None = await self._jobs_dao.read_status(status_input.job_id)
+        if jobs_dto is None:
+            return Response(status=400, text=f"Invalid jobs_id: {status_input.job_id}")
+
+        body: ResponseStatus = ResponseStatus(
+            job_id=jobs_dto.jobs_id, status=jobs_dto.job_status
+        )
+        serialized_status_dict: dict[str, Any] = body.model_dump()
+        serialized_status_str = json.dumps(serialized_status_dict)
+        return Response(text=serialized_status_str)
 
     async def result(self, request: Request) -> Response:
-        body: dict[str, Any] = {"result": [{"title": "Coffee Bean is the best"}]}
-        serialized_body = json.dumps(body)
+        try:
+            request_params: dict[str, Any] = await request.json()
+            result_input: ResultInput = ResultInput.model_validate(request_params)
+        except json.JSONDecodeError:
+            raise HTTPBadRequest(reason="Invalid JSON payload")
+        except ValidationError as err:
+            return Response(status=400, text=f"Failed to parse input with error: {err}")
+        except Exception as err:
+            print(f"Unable to parse body with err: {err}")
+            return Response(status=500, text=f"Unable to parse body with err: {err}")
+
+        jobs_dto: JobsDTO | None = await self._jobs_dao.read_status(result_input.job_id)
+        if jobs_dto is None:
+            return Response(status=400, text=f"Invalid jobs_id: {result_input.job_id}")
+        elif jobs_dto.job_status != JobStatus.COMPLETED:
+            return Response(
+                status=400,
+                text=f"jobs_id not completed: {result_input.job_id}. job_status: {jobs_dto.job_status}",
+            )
+
+        results: list[ExtractedSearchResultDTO] = (
+            await self._extracted_search_results_dao.fetch(result_input.job_id)
+        )
+        serialized_results: list[dict[str, Any]] = [
+            single_result.model_dump() for single_result in results
+        ]
+        serialized_body = json.dumps(serialized_results)
         return Response(text=serialized_body)
 
     def graceful_shutdown(self) -> None:

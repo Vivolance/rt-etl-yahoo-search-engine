@@ -4,7 +4,7 @@ from sqlalchemy import insert, Table, select, CursorResult, Row
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from database.tables import raw_search_result_table
-from src.models.dtos.raw_search_results_dto import RawSearchResultsDTO
+from src.models.dto_data_classes.raw_search_results_dto import RawSearchResultsDTO
 
 
 class RawSearchResultsDAO:

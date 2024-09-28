@@ -6,13 +6,17 @@ import toml
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 
 from src.consumers.consumers import RawSearchResultsConsumer
-from src.models.dtos.extracted_search_result_dto import ExtractedSearchResultDTO
-from src.models.dtos.raw_search_results_dto import RawSearchResultsDTO
-from src.models.dtos.status_dto import JobsDTO
+from src.models.dto_data_classes.extracted_search_result_dto import (
+    ExtractedSearchResultDTO,
+)
+from src.models.dto_data_classes.raw_search_results_dto import RawSearchResultsDTO
+from src.models.dto_data_classes.status_dto import JobsDTO
 from src.models.extractor_data_classes.extracted_search_result import (
     ExtractedSearchResult,
 )
-from src.models.kafka_records.raw_search_results import RawSearchResultsRecord
+from src.models.kafka_records_data_classes.raw_search_results import (
+    RawSearchResultsRecord,
+)
 from src.services.batcher_service import Batcher
 from src.services.daos.extracted_search_results_dao import ExtractedSearchResultsDAO
 from src.services.daos.raw_search_results_dao import RawSearchResultsDAO

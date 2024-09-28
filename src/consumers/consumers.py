@@ -4,8 +4,10 @@ from typing import Any, Generic, TypeVar, Type
 from confluent_kafka import Consumer, Message
 from pydantic import BaseModel
 
-from src.models.kafka_records.raw_search_results import RawSearchResultsRecord
-from src.models.kafka_records.raw_search_terms import RawSearchTermsRecord
+from src.models.kafka_records_data_classes.raw_search_results import (
+    RawSearchResultsRecord,
+)
+from src.models.kafka_records_data_classes.raw_search_terms import RawSearchTermsRecord
 
 ConsumerRecord = TypeVar("ConsumerRecord", bound=BaseModel)
 

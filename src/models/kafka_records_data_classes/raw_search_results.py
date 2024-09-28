@@ -2,8 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, field_serializer, field_validator
 
-from src.models.dtos.raw_search_results_dto import RawSearchResultsDTO
-from src.models.kafka_records.raw_search_terms import RawSearchTermsRecord
+from src.models.dto_data_classes.raw_search_results_dto import RawSearchResultsDTO
+from src.models.kafka_records_data_classes.raw_search_terms import RawSearchTermsRecord
 
 
 class RawSearchResultsRecord(BaseModel):

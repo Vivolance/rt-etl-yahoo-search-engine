@@ -7,6 +7,7 @@ from aiohttp import web
 from aiohttp.web_routedef import post
 import toml
 from src.router import Router
+from src.services.daos.extracted_search_results_dao import ExtractedSearchResultsDAO
 from src.services.daos.status_dao import JobsDAO
 
 if __name__ == "__main__":
@@ -21,7 +22,12 @@ if __name__ == "__main__":
     print(formatted_producer_config)
     connection_string: str = pg_config["connection_string"]
     status_dao: JobsDAO = JobsDAO(connection_string)
-    router: Router = Router(status_dao, formatted_producer_config)
+    extracted_search_results_dao: ExtractedSearchResultsDAO = ExtractedSearchResultsDAO(
+        connection_string
+    )
+    router: Router = Router(
+        status_dao, extracted_search_results_dao, formatted_producer_config
+    )
     app.add_routes(
         [
             post("/search", router.search),

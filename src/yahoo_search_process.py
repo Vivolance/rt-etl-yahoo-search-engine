@@ -7,9 +7,11 @@ import toml
 
 from src.consumers.consumers import RawSearchTermConsumer
 from src.consumers.producers import RawSearchResultsProducer
-from src.models.dtos.raw_search_results_dto import RawSearchResultsDTO
-from src.models.kafka_records.raw_search_results import RawSearchResultsRecord
-from src.models.kafka_records.raw_search_terms import RawSearchTermsRecord
+from src.models.dto_data_classes.raw_search_results_dto import RawSearchResultsDTO
+from src.models.kafka_records_data_classes.raw_search_results import (
+    RawSearchResultsRecord,
+)
+from src.models.kafka_records_data_classes.raw_search_terms import RawSearchTermsRecord
 from src.services.batcher_service import Batcher
 from src.services.daos.raw_search_results_dao import RawSearchResultsDAO
 from src.services.yahoo_search_service import YahooSearchService

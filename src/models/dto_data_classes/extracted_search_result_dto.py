@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 from src.models.extractor_data_classes.extracted_search_result import (
     ExtractedSearchResult,
@@ -14,6 +14,10 @@ class ExtractedSearchResultDTO(BaseModel):
     date: str | None
     body: str | None
     created_at: datetime
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, created_at: datetime) -> str:
+        return created_at.strftime("%Y-%m-%d %H:%M%:%S")
 
     @staticmethod
     def from_search_results(
