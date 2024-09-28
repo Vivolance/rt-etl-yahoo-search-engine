@@ -16,6 +16,14 @@ We propose an architecture which ingests these yahoo search results async
 - Users should be able to receive back the results in seconds
 - The async server should be able to handle ~1,000+ concurrent connections
 
+## Streamlit Demo:
+
+```commandline
+streamlit run client/streamlit_app.py
+```
+
+![demo.png](./images/demo.png)
+
 ## High-Level Architecture
 
 ![high-level-architecture.png](./images/high-level-architecture.png)
@@ -163,19 +171,20 @@ python src/yahoo_search_process.py
 ## TODO:
 - [x] Create Async front desk server, responsible for giving a job id to the client
 - [x] Create alembic sqlalchemy tables
-- [ ] Added `/search` endpoint 
+- [x] Added `/search` endpoint 
   - [x] to save a new record to `jobs` table
-  - [ ] Make main thread put a record to be produced, to `queue.Queue`
-  - [ ] Create background thread to listen to messages from a `queue.Queue`, to be produced to topic `raw_search_terms`
-  - [ ] Setup Kafka Cluster, create new topic `raw_search_terms`
-- [ ] Add first consumer / producer process. `yahoo_search_consumer_producer.py`
-  - [ ] Consumes from `raw_search_terms`
-  - [ ] Makes API call to yahoo search engine API
-  - [ ] Save results to `raw_search_results` table
-  - [ ] Produce message to `raw_search_results` topic
-- [ ] Add second consumer process. `extractor_consumer.py`
-  - [ ] Consumes from `raw_search_results` topic
-  - [ ] Use `raw_search_results_id` to query for full search results from `raw_search_results` PG table
-  - [ ] Extract
-  - [ ] Save results to `extracted_search_results` PG table
-  - [ ] Update SET `jobs` record's `job_status` to `JobStatus.COMPLETED`
+  - [x] Make main thread put a record to be produced, to `queue.Queue`
+  - [x] Create background thread to listen to messages from a `queue.Queue`, to be produced to topic `raw_search_terms`
+  - [x] Setup Kafka Cluster, create new topic `raw_search_terms`
+- [x] Add first consumer / producer process. `yahoo_search_consumer_producer.py`
+  - [x] Consumes from `raw_search_terms`
+  - [x] Makes API call to yahoo search engine API
+  - [x] Save results to `raw_search_results` table
+  - [x] Produce message to `raw_search_results` topic
+- [x] Add second consumer process. `extractor_consumer.py`
+  - [x] Consumes from `raw_search_results` topic
+  - [x] Use `raw_search_results_id` to query for full search results from `raw_search_results` PG table
+  - [x] Extract
+  - [x] Save results to `extracted_search_results` PG table
+  - [x] Update SET `jobs` record's `job_status` to `JobStatus.COMPLETED`
+- [x] Add Streamlit Prototype
