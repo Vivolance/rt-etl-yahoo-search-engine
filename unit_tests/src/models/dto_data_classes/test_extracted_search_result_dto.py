@@ -2,8 +2,12 @@ from datetime import datetime
 from uuid import UUID
 
 import pytest
-from src.models.dto_data_classes.extracted_search_result_dto import ExtractedSearchResultDTO
-from src.models.extractor_data_classes.extracted_search_result import ExtractedSearchResult
+from src.models.dto_data_classes.extracted_search_result_dto import (
+    ExtractedSearchResultDTO,
+)
+from src.models.extractor_data_classes.extracted_search_result import (
+    ExtractedSearchResult,
+)
 
 
 dummy_uuid: UUID = UUID("12345678123456781234567812345678")
@@ -56,10 +60,15 @@ class TestExtractedSearchResultDTO:
         ],
     )
     def test_from_search_results(
-        self, search_result: ExtractedSearchResult, jobs_id: str, expected_result: ExtractedSearchResultDTO
+        self,
+        search_result: ExtractedSearchResult,
+        jobs_id: str,
+        expected_result: ExtractedSearchResultDTO,
     ) -> None:
         # Act
-        extracted_search_result_dto = ExtractedSearchResultDTO.from_search_results(search_result, jobs_id)
+        extracted_search_result_dto = ExtractedSearchResultDTO.from_search_results(
+            search_result, jobs_id
+        )
 
         # Assert
         assert extracted_search_result_dto == expected_result

@@ -36,18 +36,17 @@ with col2:
             # Url (title)
             st.markdown(
                 f"<h3 style='margin-bottom:5px;'>{result.url}</h3>",
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
             # Date
             st.markdown(
                 f"<a href='{result.url}' style='color:green; font-size:14px;'>{result.date}</a>",
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
             # Body
             st.markdown(
                 f"<p style='font-size:14px; color:#555;'>{result.body}</p>",
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
             # Divider
             st.markdown("<hr>", unsafe_allow_html=True)
-
