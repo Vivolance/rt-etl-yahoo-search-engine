@@ -6,7 +6,6 @@ from freezegun import freeze_time
 from unittest.mock import patch
 
 from database.tables import JobStatus
-from src.models.dto_data_classes.raw_search_results_dto import RawSearchResultsDTO
 from src.models.dto_data_classes.status_dto import JobsDTO
 
 dummy_uuid: UUID = UUID("12345678123456781234567812345678")
