@@ -123,14 +123,45 @@ Topic 2: `raw_search_results`
 
 ## Producing a message
 
-### Spin up server
+### 4. Spin up server
 
 ```commandline
 export PYTHONPATH=.
 python3 src/app.py
 ```
 
-### POST command to `localhost:8000` with payload
+### 5. Run Yahoo Search Process
+
+```commandline
+python src/yahoo_search_process.py
+```
+
+### 6. Run extractor process
+
+```commandline
+export PYTHONPATH=.
+python3 src/extractor_process.py
+```
+
+#### Check topic: `raw_search_terms`
+
+```commandline
+/Users/elsonchan/Desktop/kafka_2.13-3.7.1/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic raw_search_terms --from-beginning
+
+["{\"user_id\": \"1\", \"search_term\": \"Coffee Bean\", \"job_id\": \"f2dac9d8-d840-404d-b868-568a2615aa03\", \"job_created_at\": \"2024-09-21T08:28:49\"}"]
+```
+
+#### Check topic: `raw_search_results`
+
+```commandline
+/Users/elsonchan/Desktop/kafka_2.13-3.7.1/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic raw_search_results --from-beginning
+
+[{"user_id": "1", "search_term": "Gout", "job_id": "f59200ad-50dc-46c8-8287-2c85ac25e9b1", "job_created_at": "2024-09-22T09:43:41", "raw_search_results_id": "28e9741b-d51b-4076-8153-46e48febccf5", "raw_search_at": "2024-09-22T10:14:39"}, {"user_id": "1", "search_term": "Gout", "job_id": "1831cdc1-d555-4292-bf52-f6143ce0a9dd", "job_created_at": "2024-09-22T09:43:42", "raw_search_results_id": "7ebb9571-8e17-46f3-9082-ec32c96051d0", "raw_search_at": "2024-09-22T10:14:39"}, {"user_id": "1", "search_term": "Mala", "job_id": "da93d5f9-3ef8-4808-9d1e-b177a69e1bb5", "job_created_at": "2024-09-22T10:14:39", "raw_search_results_id": "1e7fc34d-9bc3-46a1-ab4d-c361b5cb259e", "raw_search_at": "2024-09-22T10:14:39"}]
+[{"user_id": "1", "search_term": "Chicken Rice", "job_id": "7cd25644-9468-4b99-a60b-9ea25513eb1d", "job_created_at": "2024-09-22T10:14:56", "raw_search_results_id": "fadc5f38-fd6b-469a-8ced-91225cf97267", "raw_search_at": "2024-09-22T10:14:57"}]
+```
+
+
+#### POST command to `localhost:8000` with payload
 
 POST http://localhost:8000/search
 
@@ -150,30 +181,47 @@ Response
 }
 ```
 
-### Run Yahoo Search Process
 
-```commandline
-python src/yahoo_search_process.py
+#### GET command to `localhost:8000` with payload
+
+GET http://localhost:8000/status
+```json
+{
+	"job_id": "cbd44f3b-2a5c-47c6-a1e7-13abfaef9f3f"
+}
 ```
 
-## Check topic: `raw_search_terms`
-
-```commandline
-/Users/elsonchan/Desktop/kafka_2.13-3.7.1/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic raw_search_terms --from-beginning
-
-["{\"user_id\": \"1\", \"search_term\": \"Coffee Bean\", \"job_id\": \"f2dac9d8-d840-404d-b868-568a2615aa03\", \"job_created_at\": \"2024-09-21T08:28:49\"}"]
+Response
+```
+{
+	"job_id": "cbd44f3b-2a5c-47c6-a1e7-13abfaef9f3f",
+	"status": "COMPLETED"
+}
 ```
 
-## Check topic: `raw_search_results`
+#### GET command to `localhost:8000` with payload
 
-```commandline
-/Users/elsonchan/Desktop/kafka_2.13-3.7.1/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic raw_search_results --from-beginning
-
-[{"user_id": "1", "search_term": "Gout", "job_id": "f59200ad-50dc-46c8-8287-2c85ac25e9b1", "job_created_at": "2024-09-22T09:43:41", "raw_search_results_id": "28e9741b-d51b-4076-8153-46e48febccf5", "raw_search_at": "2024-09-22T10:14:39"}, {"user_id": "1", "search_term": "Gout", "job_id": "1831cdc1-d555-4292-bf52-f6143ce0a9dd", "job_created_at": "2024-09-22T09:43:42", "raw_search_results_id": "7ebb9571-8e17-46f3-9082-ec32c96051d0", "raw_search_at": "2024-09-22T10:14:39"}, {"user_id": "1", "search_term": "Mala", "job_id": "da93d5f9-3ef8-4808-9d1e-b177a69e1bb5", "job_created_at": "2024-09-22T10:14:39", "raw_search_results_id": "1e7fc34d-9bc3-46a1-ab4d-c361b5cb259e", "raw_search_at": "2024-09-22T10:14:39"}]
-[{"user_id": "1", "search_term": "Chicken Rice", "job_id": "7cd25644-9468-4b99-a60b-9ea25513eb1d", "job_created_at": "2024-09-22T10:14:56", "raw_search_results_id": "fadc5f38-fd6b-469a-8ced-91225cf97267", "raw_search_at": "2024-09-22T10:14:57"}]
+GET http://localhost:8000/result
+```json
+{
+	"job_id": "cbd44f3b-2a5c-47c6-a1e7-13abfaef9f3f"
+}
 ```
 
-## TODO:
+Response
+```
+{
+    "id": "bbff9221-f3de-4fce-9226-6ea6e2364191",
+    "jobs_id": "cbd44f3b-2a5c-47c6-a1e7-13abfaef9f3f",
+    "user_id": "1",
+    "url": "SETHLUI.COM via Yahoo",
+    "date": "",
+    "body": "Top stories These Are The Copper Hair Trends Hairdressers Are Predicting For Autumn All The Copper Hair Inspo You Need For Autumn 2024Alessandro Zeno - LAUNCHMETRICS SPOTLIGHT Rust, bronze, strawberry blonde... whatever your chosen shade, copper hair is officially ... Elle via Yahoo 10 hours ago USA TODAY via Yahoo Dunkin' announces Halloween menu which includes Munchkins Bucket, other seasonal offerings 1 hour ago BBC via Yahoo Murder suspects remain in custody after body found 21 hours ago USA TODAY via Yahoo National Coffee Day 2024: Free coffee at Dunkin', Krispy Kreme plus more deals, specials 4 days ago China’s top snack giant set to debut 1st flagship outlet in Malaysia 7 hours ago USA TODAY via Yahoo Taco Bell testing new items: Caliente Cantina Chicken Burrito, Aguas Refrescas drink 6 days ago View all",
+    "created_at": "2024-10-02 17:12:54"
+}
+```
+
+### TODO:
 - [x] Create Async front desk server, responsible for giving a job id to the client
 - [x] Create alembic sqlalchemy tables
 - [x] Added `/search` endpoint 
