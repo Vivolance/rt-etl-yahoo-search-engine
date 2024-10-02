@@ -1,5 +1,6 @@
 from asyncio import new_event_loop, AbstractEventLoop
-from typing import Sequence
+from datetime import datetime
+from typing import Sequence, Any
 
 from sqlalchemy import insert, Table, CursorResult, select, desc, Row
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, AsyncConnection
@@ -67,9 +68,14 @@ class ExtractedSearchResultsDAO:
     async def insert_many_transaction(
         self, conn: AsyncConnection, results: list[ExtractedSearchResultDTO]
     ) -> None:
-        deserialized_results: list[dict[str, str]] = [
+        deserialized_results: list[dict[str, Any]] = [
             result.model_dump() for result in results
         ]
+        # convert the created_at back from str to datetime before insertion
+        # sqlalchemy's AsyncEngine requires each dict, to follow the sqlalchemy Table's schema
+        # since created_at is a datetime, the dict must contain datetime
+        for result in deserialized_results:
+            result["created_at"] = datetime.strptime(result["created_at"], "%Y-%m-%d %H:%M:%S")
         await conn.execute(insert(self._table), deserialized_results)
 
 
