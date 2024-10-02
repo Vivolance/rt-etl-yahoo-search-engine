@@ -67,6 +67,11 @@ streamlit run client/streamlit_app.py
 
 ### 1. Setup env
 
+Create your own .env file in the root directory and set the environment with:
+```commandline
+SERVER_URL=http://localhost:8000
+```
+Then use poetry to install all the needed dependencies for this project.
 ```commandline
 poetry shell
 poetry install
