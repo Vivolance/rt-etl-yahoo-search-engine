@@ -14,6 +14,14 @@ class RawSearchResultsRecord(BaseModel):
     raw_search_results_id: str
     raw_search_at: datetime
 
+    """
+    cls in Pydantic validators: The cls argument in a field validator refers 
+    to the class that is being validated. This method is called directly by the class,
+    This allows the method to access class-level information if necessary 
+    (similar to how it would work in a class method). However, Pydantic doesn't 
+    require @classmethod because the validator is automatically treated like a 
+    class-level method during the validation process.
+    """
     @field_serializer("job_created_at")
     def serialize_job_created_at(self, value: datetime) -> str:
         return value.strftime("%Y-%m-%dT%H:%M:%S")
