@@ -9,8 +9,8 @@ class YahooSearchService:
     @staticmethod
     def create_url(search_term: str) -> str:
         """
-        Given a search term e.g "menstrual cycle"
-        1. Url encode it -> "menstrual+cycle"
+        Given a search term e.g "bananas"
+        1. Url encode it -> "bananas"
         2. Concatenate the base url "https://sg.search.yahoo.com/search?q=" with step 1
         :param search_term:
         :return:
@@ -53,9 +53,9 @@ class YahooSearchService:
         - Log and Retry the query if it raises a HTTPError
 
         Step 2: response succeeded
-        - status code is 400 (we as the client fucked up)
+        - status code is 400 (we as the client has error)
         - 200 (success)
-        - 500 (server error, the google search engine fucked up)
+        - 500 (server error, the google search engine has error)
         """
         print(f"Started google_search for {search_term}")
         try:
