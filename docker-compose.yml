@@ -1,0 +1,142 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    image: rt-etl-yahoo-search-engine
+    command: python src/app.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+      topic-creator:
+        condition: service_completed_successfully
+    environment:
+      PYTHONPATH: /app
+      ASYNC_POSTGRES_URL: postgresql+asyncpg://postgres:password@postgres:5432/yahoo_search_engine_rt
+      POSTGRES_URL: postgresql://postgres:password@postgres:5432/yahoo_search_engine_rt
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - app_network
+
+  yahoo_search:
+    image: rt-etl-yahoo-search-engine
+    command: python src/yahoo_search_process.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+      topic-creator:
+        condition: service_completed_successfully
+    environment:
+      PYTHONPATH: /app
+      ASYNC_POSTGRES_URL: postgresql+asyncpg://postgres:password@postgres:5432/yahoo_search_engine_rt
+      POSTGRES_URL: postgresql://postgres:password@postgres:5432/yahoo_search_engine_rt
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - app_network
+
+  extractor:
+    image: rt-etl-yahoo-search-engine
+    command: python src/extractor_process.py
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+      topic-creator:
+        condition: service_completed_successfully
+    environment:
+      PYTHONPATH: /app
+      ASYNC_POSTGRES_URL: postgresql+asyncpg://postgres:password@postgres:5432/yahoo_search_engine_rt
+      POSTGRES_URL: postgresql://postgres:password@postgres:5432/yahoo_search_engine_rt
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - app_network
+  migrations:
+    image: rt-etl-yahoo-search-engine
+    command: sh -c "/wait-for-postgres.sh alembic upgrade head"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASYNC_POSTGRES_URL: postgresql+asyncpg://postgres:password@postgres:5432/yahoo_search_engine_rt
+      POSTGRES_URL: postgresql://postgres:password@postgres:5432/yahoo_search_engine_rt
+      POSTGRES_PASSWORD: password  # Add this line
+    networks:
+      - app_network
+  postgres:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+  kafka:
+    image: bitnami/kafka:3.4
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/kafka/bin/kafka-topics.sh", "--bootstrap-server", "kafka:9092", "--list"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - app_network
+
+  zookeeper:
+    image: bitnami/zookeeper:3.8
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_ENABLE_AUTH: "no"
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/zookeeper/bin/zkServer.sh", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  topic-creator:
+    image: bitnami/kafka:3.4
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c", "/app/create_topics_docker.sh"]
+    volumes:
+      - ./create_topics_docker.sh:/app/create_topics_docker.sh
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

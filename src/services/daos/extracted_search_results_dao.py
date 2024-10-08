@@ -1,3 +1,4 @@
+import os
 from asyncio import new_event_loop, AbstractEventLoop
 from datetime import datetime
 from typing import Sequence, Any
@@ -9,6 +10,9 @@ from database.tables import extracted_search_results_table
 from src.models.dto_data_classes.extracted_search_result_dto import (
     ExtractedSearchResultDTO,
 )
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class ExtractedSearchResultsDAO:
@@ -75,13 +79,16 @@ class ExtractedSearchResultsDAO:
         # sqlalchemy's AsyncEngine requires each dict, to follow the sqlalchemy Table's schema
         # since created_at is a datetime, the dict must contain datetime
         for result in deserialized_results:
-            result["created_at"] = datetime.strptime(result["created_at"], "%Y-%m-%d %H:%M:%S")
+            result["created_at"] = datetime.strptime(
+                result["created_at"], "%Y-%m-%d %H:%M:%S"
+            )
         await conn.execute(insert(self._table), deserialized_results)
 
 
 if __name__ == "__main__":
+    connection_string: str = os.getenv("ASYNC_POSTGRES_URL")
     dao: ExtractedSearchResultsDAO = ExtractedSearchResultsDAO(
-        connection_string="postgresql+asyncpg://localhost:5432/yahoo_search_engine_rt"
+        connection_string=connection_string
     )
     event_loop: AbstractEventLoop = new_event_loop()
     results: list[ExtractedSearchResultDTO] = event_loop.run_until_complete(

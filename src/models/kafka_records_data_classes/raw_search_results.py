@@ -22,6 +22,7 @@ class RawSearchResultsRecord(BaseModel):
     require @classmethod because the validator is automatically treated like a 
     class-level method during the validation process.
     """
+
     @field_serializer("job_created_at")
     def serialize_job_created_at(self, value: datetime) -> str:
         return value.strftime("%Y-%m-%dT%H:%M:%S")

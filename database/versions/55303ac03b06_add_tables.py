@@ -88,4 +88,5 @@ def downgrade() -> None:
     op.drop_table("raw_search_results")
     op.drop_table("extracted_search_results")
     op.drop_table("users")
+    op.execute("DROP TYPE jobstatus")
     # ### end Alembic commands ###

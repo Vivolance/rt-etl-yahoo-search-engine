@@ -1,0 +1,1 @@
+CREATE DATABASE yahoo_search_engine_rt;

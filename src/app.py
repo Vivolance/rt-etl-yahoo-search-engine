@@ -1,14 +1,16 @@
+import os
 from typing import Any
 
 from aiohttp.web import Application
-from aiohttp.web import get
+from aiohttp.web import get, post
 from aiohttp import web
-
-from aiohttp.web_routedef import post
+from dotenv import load_dotenv
 import toml
 from src.router import Router
 from src.services.daos.extracted_search_results_dao import ExtractedSearchResultsDAO
 from src.services.daos.status_dao import JobsDAO
+
+load_dotenv()
 
 if __name__ == "__main__":
     app: Application = Application()
@@ -16,6 +18,8 @@ if __name__ == "__main__":
     config: dict[str, Any] = toml.load("src/config/config.toml")
     pg_config: dict[str, Any] = config["postgres"]
     producer_config: dict[str, str] = config["kafka"]["producer"]["server"]
+    # temporarily override bootstrap_servers with env var to make it work with docker
+    producer_config["bootstrap_servers"] = os.getenv("KAFKA_BOOTSTRAP_SERVERS")
     formatted_producer_config: dict[str, Any] = {
         key.replace("_", "."): value for key, value in producer_config.items()
     }

@@ -23,4 +23,4 @@
     auto_offset_reset = "earliest"
 
 [postgres]
-    connection_string = "postgresql+asyncpg://localhost:5432/yahoo_search_engine_rt"
+    connection_string = "postgresql+asyncpg:///yahoo_search_engine_rt"

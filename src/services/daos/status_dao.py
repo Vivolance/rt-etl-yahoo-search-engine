@@ -1,3 +1,4 @@
+import os
 from asyncio import new_event_loop, AbstractEventLoop
 from datetime import datetime
 from typing import Any
@@ -7,6 +8,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncConnec
 
 from database.tables import jobs_table, JobStatus
 from src.models.dto_data_classes.status_dto import JobsDTO
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class JobsDAO:
@@ -109,9 +113,8 @@ class JobsDAO:
 
 
 if __name__ == "__main__":
-    dao: JobsDAO = JobsDAO(
-        connection_string="postgresql+asyncpg://localhost:5432/yahoo_search_engine_rt"
-    )
+    connection_string = os.getenv("ASYNC_POSTGRES_URL")
+    dao: JobsDAO = JobsDAO(connection_string=connection_string)
     event_loop: AbstractEventLoop = new_event_loop()
     jobs_dto: JobsDTO | None = event_loop.run_until_complete(
         dao.read_status(job_id="6883d0f0-ecf6-4849-bc0a-a6ab1dedfa71")

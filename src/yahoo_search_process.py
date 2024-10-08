@@ -1,8 +1,9 @@
 import asyncio
+import os
 from asyncio import Future
 from threading import Event
 from typing import Any
-
+from dotenv import load_dotenv
 import toml
 
 from src.consumers.consumers import RawSearchTermConsumer
@@ -15,6 +16,8 @@ from src.models.kafka_records_data_classes.raw_search_terms import RawSearchTerm
 from src.services.batcher_service import Batcher
 from src.services.daos.raw_search_results_dao import RawSearchResultsDAO
 from src.services.yahoo_search_service import YahooSearchService
+
+load_dotenv()
 
 
 class YahooSearchProcess:
@@ -93,6 +96,9 @@ if __name__ == "__main__":
     config: dict[str, Any] = toml.load("src/config/config.toml")
     consumer_config: dict[str, Any] = config["kafka"]["consumer"]["yahoo_search"]
     producer_config: dict[str, Any] = config["kafka"]["producer"]["yahoo_search"]
+    # temporarily override bootstrap_servers with env var to make it work with docker
+    consumer_config["bootstrap_servers"] = os.getenv("KAFKA_BOOTSTRAP_SERVERS")
+    producer_config["bootstrap_servers"] = os.getenv("KAFKA_BOOTSTRAP_SERVERS")
     formatted_consumer_config: dict[str, Any] = {
         key.replace("_", "."): value for key, value in consumer_config.items()
     }

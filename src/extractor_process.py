@@ -1,7 +1,8 @@
 import asyncio
+import os
 from threading import Event
 from typing import Any
-
+from dotenv import load_dotenv
 import toml
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 
@@ -22,6 +23,9 @@ from src.services.daos.extracted_search_results_dao import ExtractedSearchResult
 from src.services.daos.raw_search_results_dao import RawSearchResultsDAO
 from src.services.daos.status_dao import JobsDAO
 from src.services.search_result_extractor import BS4SearchResultExtractor
+
+
+load_dotenv()
 
 
 class ExtractorProcess:
@@ -150,11 +154,15 @@ class ExtractorProcess:
 if __name__ == "__main__":
     config: dict[str, Any] = toml.load("src/config/config.toml")
     consumer_config: dict[str, Any] = config["kafka"]["consumer"]["extractor"]
+    # temporarily override bootstrap_servers with env var to make it work with docker
+    consumer_config["bootstrap_servers"] = os.getenv("KAFKA_BOOTSTRAP_SERVERS")
     formatted_consumer_config: dict[str, Any] = {
         key.replace("_", "."): value for key, value in consumer_config.items()
     }
     db_config: dict[str, Any] = config["postgres"]
-    connection_string: str = db_config["connection_string"]
+    connection_string: str = os.getenv(
+        "ASYNC_POSTGRES_URL"
+    )  # db_config["connection_string"]
     consumer: RawSearchResultsConsumer = RawSearchResultsConsumer(
         formatted_consumer_config
     )
