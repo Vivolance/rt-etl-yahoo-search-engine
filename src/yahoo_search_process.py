@@ -6,8 +6,8 @@ from typing import Any
 from dotenv import load_dotenv
 import toml
 
-from src.consumers.consumers import RawSearchTermConsumer
-from src.consumers.producers import RawSearchResultsProducer
+from src.Kafka.consumers import RawSearchTermConsumer
+from src.Kafka.producers import RawSearchResultsProducer
 from src.models.dto_data_classes.raw_search_results_dto import RawSearchResultsDTO
 from src.models.kafka_records_data_classes.raw_search_results import (
     RawSearchResultsRecord,
