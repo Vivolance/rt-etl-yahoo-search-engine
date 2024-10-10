@@ -18,9 +18,7 @@ We propose an architecture which ingests these yahoo search results async
 
 ## Streamlit Demo:
 
-```commandline
-streamlit run client/streamlit_app.py
-```
+(Refer to Step 10 under local Setup)
 
 ![demo.png](./images/demo.png)
 
@@ -63,21 +61,97 @@ streamlit run client/streamlit_app.py
 - Saves the structured data into postgres table
 - Updates the job status to completed for the job_id
 
-## Project Setup
+## Project Setup using Docker (Recommended)
+
+### Step 1. Spinning up Postgres
+
+```commandline
+brew services start postgresql@14
+```
+
+### Step 2. Running Docker
+
+```commandline
+docker-compose up --build
+```
+
+### Step 3. 
+#### Using Insomnia or other API Clients:
+
+#### 3.1 POST http://localhost:8000/search_term
+```json
+{
+	"search_term": "Chicken Rice",
+	"user_id": "1"
+}
+```
+
+Response
+
+```
+{
+	"job_id": "7cd25644-9468-4b99-a60b-9ea25513eb1d",
+	"search_term": "Chicken Rice"
+}
+```
+
+#### 3.2 GET http://localhost:8000/status
+```json
+{
+	"job_id": "cbd44f3b-2a5c-47c6-a1e7-13abfaef9f3f"
+}
+```
+
+Response
+```
+{
+	"job_id": "cbd44f3b-2a5c-47c6-a1e7-13abfaef9f3f",
+	"status": "COMPLETED"
+}
+```
+
+#### 3.3 GET http://localhost:8000/result
+```json
+{
+	"job_id": "cbd44f3b-2a5c-47c6-a1e7-13abfaef9f3f"
+}
+```
+
+Response
+```
+{
+    "id": "bbff9221-f3de-4fce-9226-6ea6e2364191",
+    "jobs_id": "cbd44f3b-2a5c-47c6-a1e7-13abfaef9f3f",
+    "user_id": "1",
+    "url": "SETHLUI.COM via Yahoo",
+    "date": "",
+    "body": "Top stories These Are The Copper Hair Trends Hairdressers Are Predicting For Autumn All The Copper Hair Inspo You Need For Autumn 2024Alessandro Zeno - LAUNCHMETRICS SPOTLIGHT Rust, bronze, strawberry blonde... whatever your chosen shade, copper hair is officially ... Elle via Yahoo 10 hours ago USA TODAY via Yahoo Dunkin' announces Halloween menu which includes Munchkins Bucket, other seasonal offerings 1 hour ago BBC via Yahoo Murder suspects remain in custody after body found 21 hours ago USA TODAY via Yahoo National Coffee Day 2024: Free coffee at Dunkin', Krispy Kreme plus more deals, specials 4 days ago China’s top snack giant set to debut 1st flagship outlet in Malaysia 7 hours ago USA TODAY via Yahoo Taco Bell testing new items: Caliente Cantina Chicken Burrito, Aguas Refrescas drink 6 days ago View all",
+    "created_at": "2024-10-02 17:12:54"
+}
+```
+
+
+## Project Setup Local
 
 ### 1. Setup env
 
 Create your own .env file in the root directory and set the environment with:
+(You may refer to the .env.example to set up your environment variables in a .env file)
 ```commandline
 SERVER_URL=http://localhost:8000
+ASYNC_POSTGRES_URL=postgresql+asyncpg://localhost:5432/yahoo_search_engine_rt
+POSTGRES_URL=postgresql://localhost:5432/yahoo_search_engine_rt
+KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 ```
+
+### Step 2. Setup Poetry
 Then use poetry to install all the needed dependencies for this project.
 ```commandline
 poetry shell
 poetry install
 ```
 
-### 2. Run Zookeeper Server
+### Step 3. Run Zookeeper Server
 
 Navigate to kafka folder
 
@@ -85,13 +159,13 @@ Navigate to kafka folder
 bin/zookeeper-server-start.sh ./config/zookeeper.properties
 ```
 
-### 3. Run Kafka Server
+### Step 4. Run Kafka Server
 
 ```commandline
 bin/kafka-server-start.sh ./config/server.properties
 ```
 
-### 4. Create two topics:
+### Step 5. Create two topics:
 
 ```
 ./create_topics.sh
@@ -121,22 +195,20 @@ Topic 2: `raw_search_results`
 }
 ```
 
-## Producing a message
-
-### 4. Spin up server
+### Step 6. Spin up server
 
 ```commandline
 export PYTHONPATH=.
 python3 src/app.py
 ```
 
-### 5. Run Yahoo Search Process
+### Step 7. Run Yahoo Search Process
 
 ```commandline
 python src/yahoo_search_process.py
 ```
 
-### 6. Run extractor process
+### Step 8. Run extractor process
 
 ```commandline
 export PYTHONPATH=.
@@ -161,7 +233,8 @@ python3 src/extractor_process.py
 ```
 
 
-#### POST command to `localhost:8000` with payload
+### Step 9. Using Insomnia or other API Clients POST command to `localhost:8000` with payload
+(Skip to step 10 for interactive Frontend)
 
 POST http://localhost:8000/search
 
@@ -220,6 +293,13 @@ Response
     "created_at": "2024-10-02 17:12:54"
 }
 ```
+
+### Step 10. Spin up Frontend (Streamlit)
+```commandline
+streamlit run client/streamlit_app.py
+```
+
+
 
 ### TODO:
 - [x] Create Async front desk server, responsible for giving a job id to the client
