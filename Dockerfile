@@ -55,8 +55,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ ./src/
 COPY alembic.ini ./
 COPY database/ ./database/
-COPY wait-for-postgres.sh /wait-for-postgres.sh
-RUN chmod +x /wait-for-postgres.sh
 
 # Default command (can be overridden)
 CMD ["python", "src/app.py"]

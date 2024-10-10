@@ -17,7 +17,7 @@ class ExtractedSearchResultDTO(BaseModel):
 
     @field_serializer("created_at")
     def serialize_created_at(self, created_at: datetime) -> str:
-        return created_at.strftime("%Y-%m-%d %H:%M%:%S")
+        return created_at.strftime("%Y-%m-%d %H:%M:%S")
 
     @staticmethod
     def from_search_results(

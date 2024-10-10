@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import toml
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 
-from src.Kafka.consumers import RawSearchResultsConsumer
+from src.consumers.consumers import RawSearchResultsConsumer
 from src.models.dto_data_classes.extracted_search_result_dto import (
     ExtractedSearchResultDTO,
 )

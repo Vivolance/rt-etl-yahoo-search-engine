@@ -11,7 +11,7 @@ from aiohttp.web_exceptions import HTTPBadRequest
 from pydantic import ValidationError
 
 from database.tables import JobStatus
-from src.Kafka.producers import RawSearchTermsProducer
+from src.consumers.producers import RawSearchTermsProducer
 from src.models.dto_data_classes.extracted_search_result_dto import (
     ExtractedSearchResultDTO,
 )

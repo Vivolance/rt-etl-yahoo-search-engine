@@ -24,7 +24,9 @@ if __name__ == "__main__":
         key.replace("_", "."): value for key, value in producer_config.items()
     }
     print(formatted_producer_config)
-    connection_string: str = pg_config["connection_string"]
+    connection_string: str = os.getenv(
+        "ASYNC_POSTGRES_URL"
+    )  # pg_config["connection_string"]
     status_dao: JobsDAO = JobsDAO(connection_string)
     extracted_search_results_dao: ExtractedSearchResultsDAO = ExtractedSearchResultsDAO(
         connection_string

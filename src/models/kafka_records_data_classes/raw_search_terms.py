@@ -5,7 +5,7 @@ from pydantic import BaseModel, field_serializer, field_validator
 
 class RawSearchTermsRecord(BaseModel):
     """
-    Kafka Record to topic: `raw_search_terms`
+    consumers Record to topic: `raw_search_terms`
     """
 
     user_id: str

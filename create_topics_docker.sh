@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Wait for Kafka to be ready
+# Wait for consumers to be ready
 until /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list; do
   echo "Waiting for Kafka to be ready..."
   sleep 5

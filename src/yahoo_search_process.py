@@ -6,8 +6,8 @@ from typing import Any
 from dotenv import load_dotenv
 import toml
 
-from src.Kafka.consumers import RawSearchTermConsumer
-from src.Kafka.producers import RawSearchResultsProducer
+from src.consumers.consumers import RawSearchTermConsumer
+from src.consumers.producers import RawSearchResultsProducer
 from src.models.dto_data_classes.raw_search_results_dto import RawSearchResultsDTO
 from src.models.kafka_records_data_classes.raw_search_results import (
     RawSearchResultsRecord,
@@ -112,6 +112,8 @@ if __name__ == "__main__":
     )
     batcher: Batcher[RawSearchTermsRecord] = Batcher()
     yahoo_search_service: YahooSearchService = YahooSearchService()
+    # use env var instead; so docker and local setup can have separate credentials
+    db_config["connection_string"] = os.getenv("ASYNC_POSTGRES_URL")
     dao: RawSearchResultsDAO = RawSearchResultsDAO(db_config["connection_string"])
     process: YahooSearchProcess = YahooSearchProcess(
         consumer=consumer,

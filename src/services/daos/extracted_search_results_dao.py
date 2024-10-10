@@ -75,6 +75,7 @@ class ExtractedSearchResultsDAO:
         deserialized_results: list[dict[str, Any]] = [
             result.model_dump() for result in results
         ]
+
         # convert the created_at back from str to datetime before insertion
         # sqlalchemy's AsyncEngine requires each dict, to follow the sqlalchemy Table's schema
         # since created_at is a datetime, the dict must contain datetime
