@@ -1,6 +1,29 @@
 version: '3.8'
 
 services:
+  streamlit_app:
+    build: .
+    image: rt-etl-yahoo-search-engine
+    command: streamlit run client/streamlit_app.py
+    ports:
+      - "8501:8501"
+    depends_on:
+      app:
+        condition: service_started
+    networks:
+      - app_network
+    environment:
+      PYTHONPATH: /app
+      SELENIUM_REMOTE_URL: http://selenium-chrome:4444/wd/hub
+      SERVER_URL: http://app:8000
+
+  selenium-chrome:
+    image: selenium/standalone-chrome:latest
+    ports:
+      - "4444:4444"
+    networks:
+      - app_network
+    shm_size: "2gb"  # Avoid shared memory issues
   app:
     build: .
     image: rt-etl-yahoo-search-engine
@@ -22,6 +45,11 @@ services:
       - "8000:8000"
     networks:
       - app_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/search" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   yahoo_search:
     image: rt-etl-yahoo-search-engine
