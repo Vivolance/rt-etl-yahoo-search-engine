@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -18,8 +20,22 @@ def take_and_display_screenshot(search_query: str) -> None:
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+
+        # Check if running in Docker or Local
+        # Connect to remote webdriver if using Docker
+        if os.getenv('SELENIUM_REMOTE_URL'):
+            selenium_url = os.getenv('SELENIUM_REMOTE_URL')
+            st.write(f"Using remote Selenium server at: {selenium_url}")
+            driver = webdriver.Remote(
+                command_executor=selenium_url,
+                options=chrome_options
+            )
+        else:
+            # Local setup with ChromeDriver
+            st.write("Using local ChromeDriver")
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+
         try:
             url = YahooSearchService.create_url(search_query)
             driver.get(url)
