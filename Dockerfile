@@ -55,6 +55,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ ./src/
 COPY alembic.ini ./
 COPY database/ ./database/
+COPY client/ ./client/
 
 # Default command (can be overridden)
 CMD ["python", "src/app.py"]
