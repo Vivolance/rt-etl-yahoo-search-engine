@@ -63,19 +63,13 @@ We propose an architecture which ingests these yahoo search results async
 
 ## Project Setup using Docker (Recommended)
 
-### Step 1. Spinning up Postgres
-
-```commandline
-brew services start postgresql@14
-```
-
-### Step 2. Running Docker
+### Step 1. Running Docker
 
 ```commandline
 docker-compose up --build
 ```
 
-### Step 3.
+### Step 2.
 Enter localhost 8501 into your url to spin up the streamlit interactive app
 ```commandline
 localhost:8501
@@ -83,9 +77,6 @@ localhost:8501
 #### OR
 Using Insomnia or other API Clients:
 (Refer to Local set up step 10)
-
-
-
 
 ## Project Setup Local
 
@@ -196,7 +187,7 @@ python3 src/extractor_process.py
 
 
 ### Step 10. Using Insomnia or other API Clients
-(Skip to step 11 for interactive Frontend)
+#### Note: Skip to step 11 for interactive Frontend. Ensure to use the same job_id throughout.
 
 POST http://localhost:8000/search
 
