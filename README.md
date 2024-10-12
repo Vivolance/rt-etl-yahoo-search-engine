@@ -62,6 +62,7 @@ We propose an architecture which ingests these yahoo search results async
 - Updates the job status to completed for the job_id
 
 ## Project Setup using Docker (Recommended)
+#### Note: May take around 5 minutes to build the images
 
 ### Step 1. Running Docker
 
