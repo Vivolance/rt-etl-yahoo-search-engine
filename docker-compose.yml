@@ -9,7 +9,7 @@ services:
       - "8501:8501"
     depends_on:
       app:
-        condition: service_started
+        condition: service_healthy
     networks:
       - app_network
     environment:
@@ -46,7 +46,7 @@ services:
     networks:
       - app_network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/search" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/healthcheck" ]
       interval: 10s
       timeout: 5s
       retries: 5
