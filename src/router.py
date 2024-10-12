@@ -183,6 +183,9 @@ class Router:
         serialized_body = json.dumps(serialized_results)
         return Response(text=serialized_body)
 
+    async def healthcheck(self, request: Request) -> Response:
+        return Response(text="pong", status=200)
+
     def graceful_shutdown(self) -> None:
         def stop_producer_thread(signum: int, stack: FrameType | None) -> Any:
             print(f"Encountered signum: {signum}")
