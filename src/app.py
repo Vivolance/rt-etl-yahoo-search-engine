@@ -39,7 +39,7 @@ if __name__ == "__main__":
             post("/search", router.search),
             get("/status", router.status),
             get("/result", router.result),
-            get("/healthcheck", router.healthcheck)
+            get("/healthcheck", router.healthcheck),
         ]
     )
     web.run_app(app, host="0.0.0.0", port=8000)

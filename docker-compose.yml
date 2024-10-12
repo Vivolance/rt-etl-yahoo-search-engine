@@ -133,12 +133,16 @@ services:
     image: bitnami/kafka:3.4
     environment:
       KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_LISTENERS: PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       ALLOW_PLAINTEXT_LISTENER: "yes"
     depends_on:
       zookeeper:
         condition: service_healthy
+    ports:
+      - "29092:29092"    # External listener
     healthcheck:
       test: ["CMD", "/opt/bitnami/kafka/bin/kafka-topics.sh", "--bootstrap-server", "kafka:9092", "--list"]
       interval: 15s

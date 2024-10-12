@@ -23,12 +23,11 @@ def take_and_display_screenshot(search_query: str) -> None:
 
         # Check if running in Docker or Local
         # Connect to remote webdriver if using Docker
-        if os.getenv('SELENIUM_REMOTE_URL'):
-            selenium_url = os.getenv('SELENIUM_REMOTE_URL')
+        if os.getenv("SELENIUM_REMOTE_URL"):
+            selenium_url = os.getenv("SELENIUM_REMOTE_URL")
             st.write(f"Using remote Selenium server at: {selenium_url}")
             driver = webdriver.Remote(
-                command_executor=selenium_url,
-                options=chrome_options
+                command_executor=selenium_url, options=chrome_options
             )
         else:
             # Local setup with ChromeDriver

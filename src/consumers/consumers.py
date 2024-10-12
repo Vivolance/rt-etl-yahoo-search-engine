@@ -1,4 +1,5 @@
 import json
+from json import JSONDecodeError
 from typing import Any, Generic, TypeVar, Type
 
 from confluent_kafka import Consumer, Message
@@ -39,7 +40,13 @@ class GenericConsumer(Generic[ConsumerRecord]):
                     f"message_bytes: {message_bytes} unexpected not of type bytes"
                 )
             message_str: str = message_bytes.decode("utf-8")
-            raw_message_list: list[dict[str, Any]] = json.loads(message_str)
+            try:
+                raw_message_list: list[dict[str, Any]] = json.loads(message_str)
+            except JSONDecodeError as err:
+                print(
+                    f"Encountered err: {err} when decoding message on GenericConsumer. message_str: {message_str}"
+                )
+                raise err
             message_list: list[ConsumerRecord] = []
             for single_message_dict in raw_message_list:
                 try:

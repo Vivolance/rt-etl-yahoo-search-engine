@@ -276,4 +276,14 @@ streamlit run client/streamlit_app.py
   - [x] Extract
   - [x] Save results to `extracted_search_results` PG table
   - [x] Update SET `jobs` record's `job_status` to `JobStatus.COMPLETED`
+- [ ] Integration Tests
+  - [ ] Consumer
+  - [ ] Producer
+  - [ ] DAO
+- [ ] Unit Tests
+  - [ ] Batcher
+- [ ] Deployment on AWS EC2 (Recommended) / Railway
+  - [ ] AWS EC2
+  - [ ] Railway
+- [ ] Prototype Extractors
 - [x] Add Streamlit Prototype
