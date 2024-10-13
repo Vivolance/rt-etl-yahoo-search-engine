@@ -1,7 +1,7 @@
 import json
 import time
 import uuid
-from concurrent.futures import Future, as_completed
+from concurrent.futures import Future
 from datetime import datetime
 from typing import Generator
 
@@ -25,6 +25,7 @@ def producer() -> Producer:
     return Producer({"bootstrap.servers": "localhost:29092"})
 
 
+# Allows you to create and delete topics
 @pytest.fixture
 def admin_client() -> AdminClient:
     return AdminClient({"bootstrap.servers": "localhost:29092"})
