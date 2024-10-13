@@ -64,20 +64,44 @@ We propose an architecture which ingests these yahoo search results async
 ## Project Setup using Docker (Recommended)
 #### Note: May take around 5 minutes to build the images
 
-### Step 1. Running Docker
+### Step 1. Running the app with `docker-compose`
 
 ```commandline
 docker-compose up --build
 ```
 
-### Step 2.
-Enter localhost 8501 into your url to spin up the streamlit interactive app
-```commandline
-localhost:8501
-```
+This spins up
+- 1 aiohttp server
+- 1 yahoo search consumer + producer
+- 1 extractor consumer
+- 1 kafka server
+- 1 zookeeper instance
+- 1 postgres instance
+- 1 remote chrome webdriver instance
+
+#Step 2:
+
+### Step 2: Visit the web application
+
+Visit `http://localhost:8501` with your web browser to see the streamlit interactive app
+
 #### OR
 Using Insomnia or other API Clients:
 (Refer to Local set up step 10)
+
+## Deploying on Ngrok
+
+Spin up the app with `docker-compose up --build`
+
+This exposes the streamlit app on port 8501
+
+Expose the application on a static url (proxy server, hosted by ngrok)
+
+The ngrok proxy server will forward requests to your locally hosted instance
+
+```commandline
+ngrok http --hostname=dove-happy-amoeba.ngrok-free.app 8501
+```
 
 ## Project Setup Local
 
