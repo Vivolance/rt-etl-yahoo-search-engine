@@ -61,6 +61,24 @@ We propose an architecture which ingests these yahoo search results async
 - Saves the structured data into postgres table
 - Updates the job status to completed for the job_id
 
+
+## Try it here!
+(https://dove-happy-amoeba.ngrok-free.app/#www-starbucks-com)
+
+### Deploying on Ngrok
+
+Spin up the app with `docker-compose up --build`
+
+This exposes the streamlit app on port 8501
+
+Expose the application on a static url (proxy server, hosted by ngrok)
+
+The ngrok proxy server will forward requests to your locally hosted instance
+
+```commandline
+ngrok http --hostname=dove-happy-amoeba.ngrok-free.app 8501
+```
+
 ## Project Setup using Docker (Recommended)
 #### Note: May take around 5 minutes to build the images
 
@@ -89,19 +107,6 @@ Visit `http://localhost:8501` with your web browser to see the streamlit interac
 Using Insomnia or other API Clients:
 (Refer to Local set up step 10)
 
-## Deploying on Ngrok
-
-Spin up the app with `docker-compose up --build`
-
-This exposes the streamlit app on port 8501
-
-Expose the application on a static url (proxy server, hosted by ngrok)
-
-The ngrok proxy server will forward requests to your locally hosted instance
-
-```commandline
-ngrok http --hostname=dove-happy-amoeba.ngrok-free.app 8501
-```
 
 ## Project Setup Local
 
