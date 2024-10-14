@@ -18,7 +18,7 @@ if "search_term" not in st.session_state or st.session_state["search_term"] == "
     st.session_state["search_term"] = None
 
 with col1:
-    search_term: str = st.text_input("Query", "Starbucks")
+    search_term: str = st.text_input("Query", "SpaceX News")
     if st.button("Search"):
         st.session_state["search_term"] = search_term
         take_and_display_screenshot(st.session_state["search_term"])

@@ -63,7 +63,7 @@ We propose an architecture which ingests these yahoo search results async
 
 
 ## Try it here!
-(https://dove-happy-amoeba.ngrok-free.app/#www-starbucks-com)
+(https://dove-happy-amoeba.ngrok-free.app)
 
 ### Deploying on Ngrok
 
