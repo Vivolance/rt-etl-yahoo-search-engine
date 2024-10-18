@@ -1,11 +1,12 @@
 import json
 import uuid
+from asyncio import Future
 from datetime import datetime
 from typing import Generator
 
 import pytest
 from confluent_kafka.admin import AdminClient, NewTopic
-from confluent_kafka import Consumer
+from confluent_kafka import Consumer, KafkaException
 
 from src.consumers.producers import AbstractProducer
 from src.models.kafka_records_data_classes.raw_search_terms import RawSearchTermsRecord
@@ -59,27 +60,49 @@ def setup_and_teardown_test_produce(
 ) -> Generator[None, None, None]:
 
     def create_topic() -> None:
-        new_topic = NewTopic(topic=topic_name, num_partitions=1, replication_factor=1)
-        fs = admin_client.create_topics([new_topic])
-        for topic, future in fs.items():
+        new_topics = [
+            NewTopic(topic=topic_name, num_partitions=1, replication_factor=1)
+        ]
+        try:
+            create_topic_futures_dict: dict[str, Future] = admin_client.create_topics(
+                new_topics
+            )
+        except KafkaException as err:
+            print("Failed to create topic")
+            pytest.fail(f"Failed to create topic: {err}")
+        for topic, future in create_topic_futures_dict.items():
             try:
                 future.result()
                 print(f"Topic '{topic}' created successfully")
             except Exception as e:
+                print(f"Failed to create topic '{topic}': {e}")
                 pytest.fail(f"Failed to create topic '{topic_name}': {e}")
 
     def drop_topic() -> None:
-        fs = admin_client.delete_topics([topic_name])
-        for topic, future in fs.items():
+        try:
+            drop_topic_futures_dict: dict[str, Future] = admin_client.delete_topics(
+                [topic_name]
+            )
+        except KafkaException as err:
+            pytest.fail(f"Failed to delete topic: {err}")
+
+        # Strategy 2: Use future.result() to block the main thread till each completes
+        # Strategy 2 is better, as it allows us to log which topic completed and failed
+        for topic, future in drop_topic_futures_dict.items():
             try:
                 future.result()
                 print(f"Topic '{topic}' deleted successfully")
             except Exception as e:
-                pytest.fail(f"Failed to delete topic '{topic_name}': {e}")
+                print(f"Failed to delete topic '{topic}': {e}")
+                pytest.fail(f"Failed to create topic: {topic}")
 
-    create_topic()
-    yield
-    drop_topic()
+    try:
+        create_topic()
+        yield
+    except Exception as e:
+        print(f"Exception: {e}")
+    finally:
+        drop_topic()
 
 
 @pytest.fixture
@@ -93,31 +116,34 @@ def abstract_producer(topic_name: str) -> AbstractProducer[RawSearchTermsRecord]
     )
 
 
-# Test class for AbstractProducer
 class TestAbstractProducer:
     """
     AbstractProducer
-    - producer
+    - producer_config
     - topic_name
 
     Test def produce
-    - Confluent Kafka Producer should produce to topic
-    - Raw message should be serialized from pydantic basemodel
+    - Abstract Producer class should be able to serialize basemodel
+    and produce to topic
 
     Prepare:
     - Create a topic
     - "raw_search_term_uuid.uuid4()"
-    - Create a consumer to consume
+    - Create a mock consumer to consume
+    - Admin Client Setup Kafka resources
 
     Act:
-    - Call produce
+    - Call produce method for Abstract Producer
 
     Assert:
-    - Consume successfully
+    - Mock Consumer should consume from topic and deserialize back to Dataclass
+    - Consume records == dummy_records
 
-    Tear Down
-    - adminclient to setup and teardown kafka resources
+    Tear Down:
+    - Admin Client to teardown kafka resources
+    - Drop Topic created
     """
+
     def test_produce(
             self,
             setup_and_teardown_test_produce,
@@ -126,11 +152,9 @@ class TestAbstractProducer:
             consumer: Consumer
     ) -> None:
 
-        # Test produce method
         abstract_producer.produce(dummy_records)
         abstract_producer.flush_producer()
 
-        # Poll for the message
         msg = consumer.poll(timeout=30)
         if msg is None:
             print("Failed to get message after waiting for 30 seconds")
