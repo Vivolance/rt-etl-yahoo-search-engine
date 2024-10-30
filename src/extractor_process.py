@@ -35,10 +35,10 @@ class ExtractorProcess:
 
     Responsible for reading raw_search_results topic
 
-    get raw_search_results_id and query PG for search results
-    extract the structure
-    save it into PG
-    update your jobs table to COMPLETED
+    1. get raw_search_results_id and query PG for search results
+    2. extract the structure
+    3. save it into PG
+    4. update your jobs table to COMPLETED
 
     Consumer:
     - RawSearchResultsConsumer
