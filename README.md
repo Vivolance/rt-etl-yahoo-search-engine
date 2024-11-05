@@ -306,8 +306,8 @@ streamlit run client/streamlit_app.py
   - [x] Save results to `extracted_search_results` PG table
   - [x] Update SET `jobs` record's `job_status` to `JobStatus.COMPLETED`
 - [ ] Integration Tests
-  - [ ] Consumer
-  - [ ] Producer
+  - [x] Consumer
+  - [x] Producer
   - [ ] DAO
 - [ ] Unit Tests
   - [ ] Batcher
@@ -316,3 +316,4 @@ streamlit run client/streamlit_app.py
   - [ ] Railway
 - [ ] Prototype Extractors
 - [x] Add Streamlit Prototype
+- [ ] Improvement to Extractor
