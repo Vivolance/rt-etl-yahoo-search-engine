@@ -309,8 +309,6 @@ streamlit run client/streamlit_app.py
   - [x] Consumer
   - [x] Producer
   - [ ] DAO
-- [ ] Unit Tests
-  - [ ] Batcher
 - [ ] Deployment on AWS EC2 (Recommended) / Railway
   - [ ] AWS EC2
   - [ ] Railway
