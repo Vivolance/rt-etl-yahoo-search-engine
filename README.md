@@ -1,5 +1,8 @@
 # RT ETL Pipeline for Extracting Structured Data from Yahoo Search HTML
 
+## Try it here!
+(https://dove-happy-amoeba.ngrok-free.app)
+
 ## Objective:
 
 Provides a robust web-server which extracts structured data from yahoo search results
@@ -60,10 +63,6 @@ We propose an architecture which ingests these yahoo search results async
 - Extracts the structured data from the result
 - Saves the structured data into postgres table
 - Updates the job status to completed for the job_id
-
-
-## Try it here!
-(https://dove-happy-amoeba.ngrok-free.app)
 
 ### Deploying on Ngrok
 
