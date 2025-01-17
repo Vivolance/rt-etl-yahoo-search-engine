@@ -31,7 +31,7 @@ We propose an architecture which ingests these yahoo search results async
 
 ## Key Design Decisions
 
-1. Async server as the front-desk.
+#### 1. Async server as the front-desk.
 - Responsible for receiving search term + creating a unique job id
 - Saves search term + customer id + job id + status of job into Postgres
 - Expose three endpoints
@@ -40,7 +40,7 @@ We propose an architecture which ingests these yahoo search results async
   - One to get results of job
 - Delegates extraction to consumer / producer process by producing to Kafka topic
 
-2. Kafka Broker
+#### 2. Kafka Broker
 - Contains two topic: `raw_search_terms` and `raw_search_results`
   - search_term: str
   - customer_id: str
@@ -48,7 +48,7 @@ We propose an architecture which ingests these yahoo search results async
   - created_at: datetime
 - This topic will be ingested by the consumer / producer process
 
-3. Yahoo Search Consumer / Producer
+#### 3. Yahoo Search Consumer / Producer
 - Responsible for making an API call to yahoo search engine with the search term
 - Saves the raw search results into Postgres
 - Produces to `raw_search_results` topic
@@ -58,33 +58,31 @@ We propose an architecture which ingests these yahoo search results async
   - search_result_id: id
   - created_at: datetime
 
-4. Extractor Consumer / Producer
+#### 4. Extractor Consumer / Producer
 - Responsible for extracting the search result from postgres
 - Extracts the structured data from the result
 - Saves the structured data into postgres table
 - Updates the job status to completed for the job_id
 
-### Deploying on Ngrok
+## Project Setup using Docker (Recommended)
 
-Spin up the app with `docker-compose up --build`
+### Step 1: Deploying on Ngrok
 
-This exposes the streamlit app on port 8501
-
-Expose the application on a static url (proxy server, hosted by ngrok)
-
-The ngrok proxy server will forward requests to your locally hosted instance
+- Spin up the app with `docker-compose up --build`
+- This exposes the streamlit app on port 8501
+- Expose the application on a static url (proxy server, hosted by ngrok)
+- The ngrok proxy server will forward requests to your locally hosted instance
 
 ```commandline
 ngrok http --hostname=dove-happy-amoeba.ngrok-free.app 8501
 ```
 
-## Project Setup using Docker (Recommended)
+### Step 2: Spinning up Docker
 #### Note: May take around 5 minutes to build the images
-
-### Step 1. Running the app with `docker-compose`
+- Ensure Docker Desktop is installed on your local and is up and running
 
 ```commandline
-docker-compose up --build
+docker compose up --build
 ```
 
 This spins up
@@ -96,9 +94,7 @@ This spins up
 - 1 postgres instance
 - 1 remote chrome webdriver instance
 
-#Step 2:
-
-### Step 2: Visit the web application
+### Step 3: Visit the web application
 
 Visit `http://localhost:8501` with your web browser to see the streamlit interactive app
 
