@@ -21,6 +21,7 @@ class YahooSearchService:
 
     @retry(
         exceptions=aiohttp.ClientError,
+        max_delay=0.03,
         tries=5,
         delay=0.01,
         jitter=(-0.01, 0.01),
