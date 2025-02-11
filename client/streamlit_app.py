@@ -17,7 +17,7 @@ st.markdown(
         .button-container {
             text-align: left;
             margin-top: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         .button-container a {
             text-decoration: none;
@@ -27,9 +27,13 @@ st.markdown(
             display: inline-block;
             font-size: 16px;
             margin: 5px;
+            transition: background-color 0.3s ease; /* Smooth transition */
         }
         .github { background-color: #24292e; }  /* GitHub (black) */
         .linkedin { background-color: #24292e; }   /* LinkedIn (black) */
+        
+        .github:hover { background-color: #0077B5; } /* Lighter blue */
+        .linkedin:hover { background-color: #0077B5; } /* LinkedIn blue */
     </style>
 
     <div class="button-container">
