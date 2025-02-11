@@ -11,6 +11,39 @@ st.set_page_config(layout="wide")
 # Shows a header component
 st.header("Yahoo Search Engine - Extracting structured data from search results")
 
+st.markdown(
+    """
+    <style>
+        .button-container {
+            text-align: left;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .button-container a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            font-size: 16px;
+            margin: 5px;
+        }
+        .github { background-color: #24292e; }  /* GitHub (black) */
+        .linkedin { background-color: #24292e; }   /* LinkedIn (black) */
+    </style>
+
+    <div class="button-container">
+        <a href="https://github.com/Vivolance/rt-etl-yahoo-search-engine" target="_blank" class="github">
+            💻 GitHub
+        </a>
+        <a href="https://www.linkedin.com/in/elsonchancj/" target="_blank" class="linkedin">
+            🌐 LinkedIn
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 col1, col2 = st.columns(2)
 
 # normalize search term to None if not set / is empty string
