@@ -19,7 +19,7 @@ def consumer(topic_name: str) -> Consumer:
     consumer_config = {
         "bootstrap.servers": "localhost:29092",
         "group.id": f"test_group_{uuid.uuid4()}",
-        "auto.offset.reset": "earliest"
+        "auto.offset.reset": "earliest",
     }
     consumer = Consumer(consumer_config)
     consumer.subscribe([topic_name])
@@ -55,8 +55,8 @@ def dummy_records() -> list[RawSearchTermsRecord]:
 # To set up and tear down the Kafka topic for testing
 @pytest.fixture
 def setup_and_teardown_test_produce(
-        admin_client: AdminClient,
-        topic_name: str,
+    admin_client: AdminClient,
+    topic_name: str,
 ) -> Generator[None, None, None]:
 
     def create_topic() -> None:
@@ -145,11 +145,11 @@ class TestAbstractProducer:
     """
 
     def test_produce(
-            self,
-            setup_and_teardown_test_produce,
-            abstract_producer: AbstractProducer[RawSearchTermsRecord],
-            dummy_records: list[RawSearchTermsRecord],
-            consumer: Consumer
+        self,
+        setup_and_teardown_test_produce,
+        abstract_producer: AbstractProducer[RawSearchTermsRecord],
+        dummy_records: list[RawSearchTermsRecord],
+        consumer: Consumer,
     ) -> None:
 
         abstract_producer.produce(dummy_records)
