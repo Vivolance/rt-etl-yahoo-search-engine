@@ -1,6 +1,6 @@
 from urllib.parse import quote
 import aiohttp
-from retry import retry
+from tenacity import wait_fixed, stop_after_attempt, retry
 
 from src.models.dto_data_classes.raw_search_results_dto import RawSearchResultsDTO
 
@@ -20,12 +20,9 @@ class YahooSearchService:
         return f"https://sg.search.yahoo.com/search?q={quote(search_term)}"
 
     @retry(
-        exceptions=aiohttp.ClientError,
-        max_delay=0.03,
-        tries=5,
-        delay=0.01,
-        jitter=(-0.01, 0.01),
-        backoff=2,
+        wait=wait_fixed(0.01),  # 10ms between each attempt
+        stop=stop_after_attempt(5),  # set 5 attempts
+        reraise=True,  # Re-raise last exception if all attempts failed
     )
     async def _search(self, user_id: str, search_term: str) -> RawSearchResultsDTO:
         """
