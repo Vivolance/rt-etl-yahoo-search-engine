@@ -30,6 +30,7 @@ webdriver-manager = "^4.0.2"
 pillow = "^10.4.0"
 pytest = "^8.3.3"
 freezegun = "^1.5.1"
+tenacity = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
@@ -42,16 +43,12 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
-ignore_missing_imports = false  # Global setting for missing imports
-explicit_package_bases = true
-
-[[tool.mypy.overrides]]
-module = "confluent_kafka.*"
-ignore_missing_imports = true  # Specific override for confluent_kafka
-
-[tool.mypy]
 strict = true
 ignore_missing_imports = true
 namespace_packages = true
 explicit_package_bases = true
 exclude = '^(\\.venv|venv|env|\\.git|node_modules)/'
+
+[[tool.mypy.overrides]]
+module = "confluent_kafka.*"
+ignore_missing_imports = true  # Specific override for confluent_kafka
