@@ -17,6 +17,8 @@ class RawSearchResultsDAO:
             deserialized_results: list[dict[str, str]] = [
                 result.model_dump() for result in results
             ]
+            # execute method takes in insert table command, and data (optional) to be inserted
+            # typically in dict or [list[dict]]
             await conn.execute(insert(self._table), deserialized_results)
 
     async def select(self, ids: list[str]) -> list[RawSearchResultsDTO]:

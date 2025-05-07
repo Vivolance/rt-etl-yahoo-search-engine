@@ -24,6 +24,12 @@ class YahooSearchProcess:
     """
     High-Level Orchestrator
     - Responsible for starting both the consumer and producer
+
+    1. Makes yahoo call based on consumed search term from first producer
+    2. Inserts raw html into raw_search_result_table in DB
+    3. Create RawSearchResultsRecord, we only want to produce metadata about the raw results to kafka, not the entire
+    html
+    4. Produce RawSearchResultsRecord to second topic ()
     """
 
     def __init__(

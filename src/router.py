@@ -90,6 +90,8 @@ class Router:
 
     async def search(self, request: Request) -> Response:
         try:
+            # awaitable because calling .json() on a request reads the header and body from the network socket, which
+            # might still be streaming in from the client
             body: dict[str, Any] = await request.json()
             search_input: SearchInput = SearchInput.model_validate(body)
         except json.JSONDecodeError:
@@ -121,6 +123,7 @@ class Router:
 
         serialized_body_dict: dict[str, Any] = response_body.model_dump()
         serialized_body: str = json.dumps(serialized_body_dict)
+        # Return a response with the job_id to the user so that the user can query for its status
         return Response(text=serialized_body)
 
     async def status(self, request: Request) -> Response:
