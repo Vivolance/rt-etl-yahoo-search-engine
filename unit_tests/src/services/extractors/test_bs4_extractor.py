@@ -1,9 +1,7 @@
 from datetime import datetime
-from unittest.mock import patch
 from uuid import UUID
 
 import pytest
-from freezegun import freeze_time
 
 from src.services.search_result_extractor import BS4SearchResultExtractor
 from src.models.extractor_data_classes.extracted_search_result import (
