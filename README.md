@@ -106,7 +106,7 @@ This spins up
 
 ### Step 3: Visit the web application
 
-Visit `http://localhost:8501` with your web browser to see the streamlit interactive app
+Visit `http://localhost:8501` or `https://dove-happy-amoeba.ngrok-free.app` with your web browser to see the streamlit interactive app
 
 #### OR
 Using Insomnia or other API Clients:
