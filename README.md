@@ -66,9 +66,19 @@ We propose an architecture which ingests these yahoo search results async
 
 ## Project Setup using Docker (Recommended)
 
-### Step 1: Deploying on Ngrok
+### Prerequisites
+- Docker **>= 28.0.1**
+- Docker Compose **>= 2.33.1**
 
-- Spin up the app with `docker-compose up --build`
+Make sure you have docker installed with the above versions on your machine
+You can check with:
+```bash
+docker --version
+docker compose version
+```
+
+### Step 1: Deploying UI on Ngrok
+
 - This exposes the streamlit app on port 8501
 - Expose the application on a static url (proxy server, hosted by ngrok)
 - The ngrok proxy server will forward requests to your locally hosted instance
